@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — BookEase</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/animations.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+
+<link rel="manifest" href="../manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BookEase">
+<meta name="theme-color" content="#FFCA28">
+</head>
+<body class="page-load" data-theme="dark">
+<div class="dashboard-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><a href="#">Book<span>Ease</span></a><div style="background:var(--danger);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:var(--radius-full);margin-left:8px">ADMIN</div></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Platform</div>
+      <a class="sidebar-link active" onclick="showSection('overview')"><span class="icon">📊</span>Overview</a>
+      <a class="sidebar-link" onclick="showSection('hosts')"><span class="icon">🏪</span>Hosts</a>
+      <a class="sidebar-link" onclick="showSection('clients')"><span class="icon">👥</span>Clients</a>
+      <a class="sidebar-link" onclick="showSection('bookings')"><span class="icon">📅</span>All Bookings</a>
+      <a class="sidebar-link" onclick="showSection('settings')"><span class="icon">⚙️</span>Settings</a>
+      <a class="sidebar-link" onclick="logout()" style="color:rgba(255,76,96,0.7)"><span class="icon">🚪</span>Sign Out</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <img class="sidebar-user-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Admin" alt="Admin">
+        <div><div class="sidebar-user-name">Admin</div><div class="sidebar-user-role">Platform Admin</div></div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <main class="dashboard-main">
+    <div class="dashboard-topbar">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+      <h1 class="topbar-title" id="topbarTitle">Platform Overview</h1>
+      <div class="topbar-actions">
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode"><span id="themeIcon">🌙</span></button>
+        <span style="color:var(--danger);font-weight:700;font-size:0.82rem;border:1px solid var(--danger);padding:4px 12px;border-radius:var(--radius-full)">ADMIN MODE</span>
+      </div>
+    </div>
+    <div class="dashboard-content">
+
+      <!-- Overview -->
+      <section id="secOverview" class="dash-section">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon gold">👥</div><div class="stat-value" id="aStatUsers">—</div><div class="stat-label">Total Clients</div></div>
+          <div class="stat-card"><div class="stat-icon teal">🏪</div><div class="stat-value" id="aStatHosts">—</div><div class="stat-label">Total Hosts</div></div>
+          <div class="stat-card"><div class="stat-icon blue">📅</div><div class="stat-value" id="aStatBookings">—</div><div class="stat-label">Total Bookings</div></div>
+          <div class="stat-card"><div class="stat-icon red">📆</div><div class="stat-value" id="aStatToday">—</div><div class="stat-label">Bookings Today</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>Pending Host Verifications</h3><span class="chip chip-pending" id="pendingCount">0 pending</span></div>
+          <table><thead><tr><th>Business</th><th>Owner</th><th>Type</th><th>Joined</th><th>Action</th></tr></thead>
+          <tbody id="pendingHostsTable"></tbody></table>
+        </div>
+      </section>
+
+      <!-- Hosts -->
+      <section id="secHosts" class="dash-section hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <h2>All Hosts 🏪</h2>
+          <div class="search-bar" style="max-width:300px"><span>🔍</span><input type="text" id="hostSearch" placeholder="Search hosts..." oninput="searchHosts()"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Business</th><th>Owner</th><th>Type</th><th>Rating</th><th>Verified</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="hostsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Clients -->
+      <section id="secClients" class="dash-section hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <h2>All Clients 👥</h2>
+          <div class="search-bar" style="max-width:300px"><span>🔍</span><input type="text" id="clientSearch" placeholder="Search clients..." oninput="searchClients()"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="clientsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Bookings -->
+      <section id="secBookings" class="dash-section hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <h2>All Bookings 📅</h2>
+          <button class="btn btn-success btn-sm" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Booking ID</th><th>Client</th><th>Host</th><th>Service</th><th>Date</th><th>Status</th><th>Payment</th><th>Amount</th></tr></thead>
+            <tbody id="allBookingsTable"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:20px" id="bookingsPagination"></div>
+      </section>
+
+      <!-- Settings -->
+      <section id="secSettings" class="dash-section hidden">
+        <h2 style="margin-bottom:24px">Platform Settings ⚙️</h2>
+        <div style="max-width:560px">
+          <div class="dash-card" style="padding:32px;margin-bottom:20px">
+            <h3 style="margin-bottom:20px">General</h3>
+            <div class="form-group"><label class="form-label">Platform Name</label><input type="text" class="form-control" value="BookEase" id="settingName"></div>
+            <div class="form-group"><label class="form-label">Support Email</label><input type="email" class="form-control" value="support@bookease.app" id="settingEmail"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid var(--border)">
+              <div><strong>Maintenance Mode</strong><p class="text-muted text-sm">Disable new bookings temporarily</p></div>
+              <label class="toggle-switch"><input type="checkbox" id="maintenanceMode" onchange="toggleMaintenance()"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid var(--border)">
+              <div><strong>Auto-verify Hosts</strong><p class="text-muted text-sm">Skip manual verification</p></div>
+              <label class="toggle-switch"><input type="checkbox" id="autoVerify"><span class="toggle-slider"></span></label>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script>
+const API = window.API_BASE || 'http://localhost:5001/api';
+const token = localStorage.getItem('be_token');
+if (!token) { window.location.href = 'login.html'; }
+
+function showSection(id) {
+  document.querySelectorAll('.dash-section').forEach(s => s.classList.add('hidden'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1)).classList.remove('hidden');
+  const titles = {overview:'Platform Overview',hosts:'All Hosts',clients:'All Clients',bookings:'All Bookings',settings:'Platform Settings'};
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+  if (id === 'overview') loadStats();
+  if (id === 'hosts') loadHosts();
+  if (id === 'clients') loadClients();
+  if (id === 'bookings') loadAllBookings();
+}
+
+async function apiFetch(path, opts={}) {
+  const r = await fetch(API + path, { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, ...opts });
+  return r.json();
+}
+
+async function loadStats() {
+  const d = await apiFetch('/admin/stats');
+  document.getElementById('aStatUsers').textContent = d.totalUsers || 0;
+  document.getElementById('aStatHosts').textContent = d.totalHosts || 0;
+  document.getElementById('aStatBookings').textContent = d.totalBookings || 0;
+  document.getElementById('aStatToday').textContent = d.todayBookings || 0;
+  document.getElementById('pendingCount').textContent = (d.pendingHosts || 0) + ' pending';
+  loadPendingHosts();
+}
+
+async function loadPendingHosts() {
+  const d = await apiFetch('/admin/hosts');
+  const pending = (d.hosts || []).filter(h => !h.isVerified);
+  const tb = document.getElementById('pendingHostsTable');
+  if (!pending.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted)">No pending verifications ✅</td></tr>'; return; }
+  tb.innerHTML = pending.map(h => `<tr>
+    <td><strong>${h.businessName}</strong></td>
+    <td class="td-user"><div class="td-name">${h.userId?.fullName||'—'}</div></td>
+    <td>${h.businessType}</td>
+    <td>${new Date(h.createdAt).toLocaleDateString()}</td>
+    <td><button class="btn btn-success btn-sm" onclick="verifyHost('${h._id}',true)">✓ Verify</button></td>
+  </tr>`).join('');
+}
+
+async function loadHosts() {
+  const d = await apiFetch('/admin/hosts');
+  const tb = document.getElementById('hostsTable');
+  tb.innerHTML = (d.hosts||[]).map(h => `<tr>
+    <td><strong>${h.businessName}</strong><br><span class="text-muted text-sm">${h.businessSlug}</span></td>
+    <td class="td-user"><div class="td-name">${h.userId?.fullName||'—'}</div><div class="td-email">${h.userId?.email||'—'}</div></td>
+    <td>${h.businessType}</td>
+    <td>${h.rating} ⭐</td>
+    <td>${h.isVerified ? '<span class="chip chip-confirmed">Verified</span>' : '<span class="chip chip-pending">Pending</span>'}</td>
+    <td>${h.isActive ? '<span class="chip chip-confirmed">Active</span>' : '<span class="chip chip-cancelled">Inactive</span>'}</td>
+    <td style="display:flex;gap:6px">
+      <button class="btn btn-sm ${h.isVerified?'btn-danger':'btn-success'}" onclick="verifyHost('${h._id}',${!h.isVerified})">${h.isVerified?'Revoke':'Verify'}</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function loadClients() {
+  const d = await apiFetch('/admin/users?role=client');
+  const tb = document.getElementById('clientsTable');
+  tb.innerHTML = (d.users||[]).map(u => `<tr>
+    <td class="td-user"><img class="td-avatar" src="${u.profileImage||'https://api.dicebear.com/7.x/initials/svg?seed='+encodeURIComponent(u.fullName)}" alt=""><div><div class="td-name">${u.fullName}</div></div></td>
+    <td>${u.email}</td>
+    <td>${u.phone}</td>
+    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+    <td>${u.isSuspended ? '<span class="chip chip-cancelled">Suspended</span>' : '<span class="chip chip-confirmed">Active</span>'}</td>
+    <td><button class="btn btn-sm ${u.isSuspended?'btn-success':'btn-danger'}" onclick="suspendUser('${u._id}',${!u.isSuspended})">${u.isSuspended?'Unsuspend':'Suspend'}</button></td>
+  </tr>`).join('');
+}
+
+let allBookingsPage = 1;
+async function loadAllBookings(page=1) {
+  allBookingsPage = page;
+  const d = await apiFetch(`/admin/bookings?page=${page}&limit=20`);
+  const tb = document.getElementById('allBookingsTable');
+  tb.innerHTML = (d.bookings||[]).map(b => `<tr>
+    <td><code style="font-size:0.78rem;color:var(--accent)">#${b.bookingId}</code></td>
+    <td>${b.clientId?.fullName||'—'}</td>
+    <td>${b.hostId?.businessName||'—'}</td>
+    <td>${b.serviceId?.name||'—'}</td>
+    <td>${b.bookingDate} ${b.bookingTime}</td>
+    <td><span class="chip chip-${b.status}">${b.status}</span></td>
+    <td><span class="chip chip-${b.paymentMode}">${b.paymentMode}</span></td>
+    <td>₹${b.amount}</td>
+  </tr>`).join('');
+  // Pagination
+  const totalPages = Math.ceil((d.total||0)/20);
+  const pg = document.getElementById('bookingsPagination');
+  pg.innerHTML = '';
+  for (let i=1;i<=totalPages;i++) {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm ' + (i===page?'btn-primary':'btn-outline');
+    btn.textContent = i; btn.onclick = () => loadAllBookings(i);
+    pg.appendChild(btn);
+  }
+}
+
+function searchHosts() {
+  const q = document.getElementById('hostSearch').value.toLowerCase();
+  document.querySelectorAll('#hostsTable tr').forEach(r => r.style.display = r.textContent.toLowerCase().includes(q)?'':'none');
+}
+function searchClients() {
+  const q = document.getElementById('clientSearch').value.toLowerCase();
+  document.querySelectorAll('#clientsTable tr').forEach(r => r.style.display = r.textContent.toLowerCase().includes(q)?'':'none');
+}
+
+async function verifyHost(id, verify) {
+  await apiFetch(`/admin/hosts/${id}/verify`, { method:'PUT', body: JSON.stringify({verify}) });
+  showToast(verify ? 'Host verified!' : 'Verification revoked', verify ? 'success' : 'info');
+  loadHosts(); loadStats();
+}
+async function suspendUser(id, suspend) {
+  await apiFetch(`/admin/users/${id}/suspend`, { method:'PUT', body: JSON.stringify({suspend}) });
+  showToast(suspend ? 'User suspended' : 'User unsuspended', suspend ? 'error' : 'success');
+  loadClients();
+}
+
+function exportCSV() {
+  window.open(API + '/admin/export-csv?token=' + token, '_blank');
+}
+function saveSettings() { showToast('Settings saved!', 'success'); }
+function toggleMaintenance() { showToast(document.getElementById('maintenanceMode').checked ? 'Maintenance mode ON' : 'Maintenance mode OFF', 'info'); }
+
+function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('show'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+
+// Theme
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.body.setAttribute('data-theme', next);
+  html.className = next === 'dark' ? 'dark-theme' : 'light-theme';
+  document.body.style.display = 'none';
+  document.body.offsetHeight;
+  document.body.style.display = '';
+  localStorage.setItem('be_theme', next);
+  var icons = document.querySelectorAll('#themeIcon, .theme-icon');
+  icons.forEach(function(icon) { icon.textContent = next === 'dark' ? '🌙' : '☀️'; });
+}
+(function() {
+  var saved = localStorage.getItem('be_theme') || 'dark';
+  var html = document.documentElement;
+  html.setAttribute('data-theme', saved);
+  document.body.setAttribute('data-theme', saved);
+  html.className = saved === 'dark' ? 'dark-theme' : 'light-theme';
+  var icons = document.querySelectorAll('#themeIcon, .theme-icon');
+  icons.forEach(function(icon) { icon.textContent = saved === 'dark' ? '🌙' : '☀️'; });
+})();
+
+loadStats();
+</script>
+</body>
+</html>

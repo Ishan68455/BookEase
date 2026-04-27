@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Page Not Found | BookEase</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/animations.css">
+<style>
+.notfound { min-height: 100vh; background: var(--primary); display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+.notfound-bg { position: fixed; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,202,40,0.08) 0%, transparent 70%); pointer-events: none; }
+.notfound-code { font-size: clamp(6rem, 18vw, 14rem); font-weight: 900; line-height: 1; background: linear-gradient(135deg, var(--accent), var(--success)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+.notfound h2 { color: #fff; font-size: clamp(1.5rem, 4vw, 2.2rem); margin-bottom: 16px; }
+.notfound p { color: rgba(255,255,255,0.5); max-width: 420px; margin: 0 auto 36px; line-height: 1.7; }
+.notfound-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+</style>
+
+<link rel="manifest" href="../manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BookEase">
+<meta name="theme-color" content="#FFCA28">
+</head>
+<body data-theme="dark">
+<div class="notfound-bg"></div>
+<div class="notfound">
+  <div class="scale-in">
+    <div class="notfound-code float">404</div>
+    <h2>Oops! This page doesn't exist.</h2>
+    <p>The page you're looking for might have been moved, deleted, or maybe never existed. Let's get you back on track.</p>
+    <div class="notfound-actions">
+      <a href="index.html" class="btn btn-primary btn-lg">← Go Home</a>
+      <a href="client-dashboard.html" class="btn btn-outline btn-lg">My Dashboard</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

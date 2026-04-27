@@ -1,0 +1,66 @@
+/* BookEase — Animations CSS */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+@keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(40px); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes glowPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,202,40,0.3); } 50% { box-shadow: 0 0 50px rgba(255,202,40,0.6); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes marqueeAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes heroText { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes borderGlow { 0%,100% { border-color: rgba(255,202,40,0.3); } 50% { border-color: rgba(255,202,40,0.8); } }
+@keyframes checkmark { 0% { stroke-dashoffset: 50; opacity: 0; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+
+.anim-init { opacity: 0; transform: translateY(32px); }
+.anim-in { animation: fadeUp 0.6s cubic-bezier(0.4,0,0.2,1) forwards; }
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.2s; }
+.anim-delay-3 { animation-delay: 0.3s; }
+.anim-delay-4 { animation-delay: 0.4s; }
+.anim-delay-5 { animation-delay: 0.5s; }
+.anim-scale { opacity: 0; transform: scale(0.92); }
+.anim-scale.anim-in { animation: scaleIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+.page-load { animation: fadeIn 0.4s ease; }
+.hero-title { animation: heroText 0.9s cubic-bezier(0.4,0,0.2,1) both; }
+.hero-subtitle { animation: heroText 0.9s cubic-bezier(0.4,0,0.2,1) 0.15s both; }
+.hero-cta { animation: heroText 0.9s cubic-bezier(0.4,0,0.2,1) 0.3s both; }
+.glow-pulse { animation: glowPulse 2.5s ease-in-out infinite; }
+.float { animation: float 3s ease-in-out infinite; }
+
+.gradient-text {
+  background: linear-gradient(270deg, #FFCA28, #FF4C60, #00C896, #FFCA28);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+}
+
+.marquee-wrap { overflow: hidden; white-space: nowrap; }
+.marquee-inner { display: inline-flex; animation: marqueeAnim 30s linear infinite; }
+.marquee-inner:hover { animation-play-state: paused; }
+.border-glow { animation: borderGlow 2s ease-in-out infinite; }
+.checkmark-circle { stroke-dasharray: 50; stroke-dashoffset: 50; animation: checkmark 0.6s cubic-bezier(0.4,0,0.2,1) 0.3s forwards; }
+
+.stagger-cards .card:nth-child(1) { animation-delay: 0s; }
+.stagger-cards .card:nth-child(2) { animation-delay: 0.08s; }
+.stagger-cards .card:nth-child(3) { animation-delay: 0.16s; }
+.stagger-cards .card:nth-child(4) { animation-delay: 0.24s; }
+.stagger-cards .card:nth-child(5) { animation-delay: 0.32s; }
+.stagger-cards .card:nth-child(6) { animation-delay: 0.4s; }
+
+.hover-lift { transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+.hover-scale:hover { transform: scale(1.03); }
+.hover-glow:hover { box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow-md); }
+.fade-in { animation: fadeIn 0.4s ease; }
+.scale-in { animation: scaleIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+.slide-down { animation: slideDown 0.3s ease; }
+#particles-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.progress-bar-wrap { height: 6px; background: var(--border); border-radius: var(--radius-full); overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: var(--radius-full); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }

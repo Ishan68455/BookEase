@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmed — BookEase</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/animations.css">
+<link rel="stylesheet" href="../css/booking.css">
+<style>
+@media print { .no-print { display: none !important; } body { background: #fff !important; color: #000 !important; } }
+</style>
+
+<link rel="manifest" href="../manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BookEase">
+<meta name="theme-color" content="#FFCA28">
+</head>
+<body class="page-load" data-theme="dark" style="background:var(--primary);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px">
+
+<div class="confirmation-wrap">
+  <div class="confirmation-icon">🎉</div>
+  <h1 class="confirmation-title" style="color:#fff">Booking Confirmed!</h1>
+  <p class="confirmation-subtitle">Your appointment has been booked successfully. Check your email & WhatsApp for details.</p>
+
+  <div class="confirmation-card">
+    <div class="confirmation-booking-id">Booking ID</div>
+    <div class="confirmation-id-val" id="confId">—</div>
+    <div class="confirm-row"><span class="confirm-label">🏪 Business</span><span class="confirm-value" id="confBiz">—</span></div>
+    <div class="confirm-row"><span class="confirm-label">💆 Service</span><span class="confirm-value" id="confService">—</span></div>
+    <div class="confirm-row"><span class="confirm-label">📅 Date</span><span class="confirm-value" id="confDate">—</span></div>
+    <div class="confirm-row"><span class="confirm-label">⏰ Time</span><span class="confirm-value" id="confTime">—</span></div>
+    <div class="confirm-row"><span class="confirm-label">💳 Payment</span><span class="confirm-value" id="confPayment">—</span></div>
+    <div class="confirm-row" style="border:none;padding-top:16px">
+      <span style="font-weight:700;font-size:1rem">Total Amount</span>
+      <span style="color:var(--success);font-size:1.3rem;font-weight:800" id="confAmount">₹—</span>
+    </div>
+  </div>
+
+  <div style="background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.2);border-radius:var(--radius-lg);padding:16px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+    <span style="font-size:1.2rem">📧</span>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;text-align:left">Confirmation email & WhatsApp message sent! Please check your inbox.</p>
+  </div>
+
+  <div class="confirmation-actions">
+    <button class="btn btn-primary" onclick="addToCalendar()">📆 Add to Calendar</button>
+    <button class="btn btn-success" id="waShareBtn" onclick="shareOnWhatsApp()">💬 Share on WhatsApp</button>
+    <button class="btn btn-dark no-print" onclick="window.print()">🖨️ Print</button>
+    <a href="client-dashboard.html" class="btn btn-outline no-print">📋 My Bookings →</a>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/utils.js"></script>
+<script>
+const data = JSON.parse(localStorage.getItem('be_lastBooking') || '{}');
+document.getElementById('confId').textContent = '#' + (data.bookingId || '—');
+document.getElementById('confBiz').textContent = data.businessName || '—';
+document.getElementById('confService').textContent = data.serviceName || '—';
+document.getElementById('confDate').textContent = data.bookingDate || '—';
+document.getElementById('confTime').textContent = data.bookingTime || '—';
+document.getElementById('confPayment').textContent = data.paymentMode === 'cod' ? '💵 Pay at Shop' : '💳 Online (Paid)';
+document.getElementById('confAmount').textContent = '₹' + (data.amount || '—');
+
+// Theme
+const t = localStorage.getItem('be_theme') || 'dark';
+document.documentElement.setAttribute('data-theme', t);
+
+function addToCalendar() {
+  if (!data.bookingDate || !data.bookingTime) return showToast('No booking data found', 'error');
+  const start = new Date(`${data.bookingDate}T${data.bookingTime}`);
+  const end = new Date(start.getTime() + (data.duration || 60) * 60000);
+  const fmt = d => d.toISOString().replace(/[-:]/g,'').replace('.000','');
+  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nSUMMARY:${data.serviceName||'Appointment'} at ${data.businessName||'BookEase'}\nDESCRIPTION:Booking ID: #${data.bookingId||''}\nEND:VEVENT\nEND:VCALENDAR`;
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `bookease-${data.bookingId||'appointment'}.ics`;
+  a.click();
+  showToast('Calendar event downloaded!', 'success');
+}
+
+function shareOnWhatsApp() {
+  const msg = encodeURIComponent(`✅ Booking Confirmed!\n🏪 ${data.businessName}\n💆 ${data.serviceName}\n📅 ${data.bookingDate} at ${data.bookingTime}\n🔖 Booking ID: #${data.bookingId}\n\nBooked via BookEase 📱`);
+  window.open('https://wa.me/?text=' + msg, '_blank');
+}
+
+// Confetti effect
+(function confetti() {
+  const colors = ['#FFCA28','#00C896','#FF4C60','#fff'];
+  for (let i=0;i<60;i++) {
+    const p = document.createElement('div');
+    p.style.cssText = `position:fixed;width:8px;height:8px;border-radius:50%;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}vw;top:-10px;animation:fadeUp ${1+Math.random()*2}s ${Math.random()*2}s ease-in forwards;pointer-events:none;z-index:9999;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 4000);
+  }
+})();
+</script>
+</body>
+</html>

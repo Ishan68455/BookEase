@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — BookEase</title>
+  <meta name="description" content="Sign in or create your BookEase account.">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 40px 20px;
+    }
+
+    .auth-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 70% 50%, rgba(255, 202, 40, 0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .auth-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 202, 40, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 202, 40, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .auth-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 980px;
+      width: 100%;
+      gap: 0;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-left {
+      background: linear-gradient(145deg, #1A1A2E, #0D0D0D);
+      padding: 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid rgba(255, 202, 40, 0.1);
+    }
+
+    .auth-brand {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.03em;
+      margin-bottom: 48px;
+    }
+
+    .auth-brand span {
+      color: var(--accent);
+    }
+
+    .auth-left h2 {
+      color: #fff;
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+    }
+
+    .auth-left p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .auth-feature {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .auth-feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 202, 40, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .auth-feature-text {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.88rem;
+    }
+
+    .auth-right {
+      background: #111120;
+      padding: 48px;
+      position: relative;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+
+    .auth-right::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .auth-right::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius-full);
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--radius-full);
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: rgba(255, 255, 255, 0.5);
+      border: none;
+      background: none;
+    }
+
+    .auth-tab.active {
+      background: var(--accent);
+      color: var(--primary);
+    }
+
+    .auth-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .auth-panel.active {
+      display: block;
+    }
+
+    .auth-panel h3 {
+      color: #fff;
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+    }
+
+    .auth-panel .subtitle {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+    }
+
+    .role-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .role-card {
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .role-card:hover {
+      border-color: rgba(255, 202, 40, 0.4);
+    }
+
+    .role-card.selected {
+      border-color: var(--accent);
+      background: rgba(255, 202, 40, 0.08);
+    }
+
+    .role-card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .role-card-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .role-card-desc {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    .form-control-dark {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .form-control-dark::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .form-control-dark:focus {
+      border-color: var(--accent);
+      background: rgba(255, 202, 40, 0.04);
+    }
+
+    .form-label-light {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .auth-link {
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    .auth-link:hover {
+      text-decoration: underline;
+    }
+
+    .auth-link:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+
+    .otp-inputs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .otp-input {
+      width: 48px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .otp-input:focus {
+      border-color: var(--accent);
+      background: rgba(255, 202, 40, 0.06);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .otp-input.error {
+      border-color: var(--danger);
+      animation: shake 0.4s ease;
+    }
+
+    .otp-input.success {
+      border-color: var(--success);
+    }
+
+    .forgot-step {
+      display: none;
+    }
+
+    .forgot-step.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 16px;
+      text-decoration: none;
+    }
+
+    .google-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .divider-auth {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.85rem;
+      margin: 20px 0;
+    }
+
+    .divider-auth::before,
+    .divider-auth::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .divider-auth:not(:empty)::before {
+      margin-right: 10px;
+    }
+
+    .divider-auth:not(:empty)::after {
+      margin-left: 10px;
+    }
+
+    /* Custom OTP Modal */
+    .otp-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      padding: 20px;
+    }
+
+    .otp-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .otp-modal-content {
+      background: #161625;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      transform: scale(0.95) translateY(20px);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 202, 40, 0.2);
+      position: relative;
+    }
+
+    .otp-modal.active .otp-modal-content {
+      transform: scale(1) translateY(0);
+    }
+
+    .otp-timer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      margin-top: 20px;
+    }
+
+    .close-modal-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-modal-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--danger);
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: var(--accent);
+      opacity: 0;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-5px);
+      }
+
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .auth-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-left {
+        display: none;
+      }
+
+      .auth-right {
+        padding: 32px 24px;
+        max-height: none;
+      }
+
+      .role-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <link rel="manifest" href="../manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BookEase">
+  <meta name="theme-color" content="#FFCA28">
+</head>
+
+<body class="page-load">
+  <div class="auth-page">
+    <div class="auth-bg"></div>
+    <div class="auth-grid-bg"></div>
+
+    <div class="auth-layout scale-in">
+      <!-- Left panel -->
+      <div class="auth-left">
+        <div class="auth-brand">Book<span>Ease</span></div>
+        <h2>The smarter way to book services.</h2>
+        <p>Join thousands of clients and hosts on BookEase — the premium booking platform built for speed, simplicity,
+          and style.</p>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">⚡</div>
+          <div class="auth-feature-text">Instant booking confirmation via email & WhatsApp</div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📅</div>
+          <div class="auth-feature-text">Real-time slot availability — no double bookings</div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">💳</div>
+          <div class="auth-feature-text">Pay online or at shop — your choice</div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🔐</div>
+          <div class="auth-feature-text">Secure OTP authentication</div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="auth-right">
+        <div class="auth-tabs" id="authTabs">
+          <button class="auth-tab active" data-tab="signin" id="tabSignin" onclick="switchTab('signin')">Sign
+            In</button>
+          <button class="auth-tab" data-tab="signup" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- ================= SIGN IN PANEL ================= -->
+        <div class="auth-panel active" id="panelSignin">
+          <h3>Welcome back 👋</h3>
+          <p class="subtitle">Sign in to your BookEase account</p>
+
+          <form id="signinForm" novalidate>
+            <div class="form-group">
+              <label class="form-label form-label-light">Email Address</label>
+              <div class="input-group">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="signinEmail" class="form-control form-control-dark"
+                  placeholder="you@example.com" required>
+              </div>
+              <div class="form-error" id="signinEmailErr">Enter a valid email</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-light">Password</label>
+              <div class="input-group" style="position:relative">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="signinPass" class="form-control form-control-dark" placeholder="••••••••"
+                  required>
+                <button type="button" class="input-action" onclick="togglePwd('signinPass',this)"
+                  style="position:absolute;right:14px;top:50%;transform:translateY(-50%)">👁</button>
+              </div>
+              <div class="form-error" id="signinPassErr">Password is required</div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+              <label
+                style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);font-size:0.85rem;cursor:pointer"><input
+                  type="checkbox" id="rememberMe"> Remember me</label>
+              <span class="auth-link" onclick="showForgot()" style="font-size:0.85rem">Forgot password?</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" id="signinBtn">Sign In with Password →</button>
+          </form>
+
+          <button class="btn btn-outline w-full" style="margin-top: 12px; padding: 13px; font-size: 0.95rem"
+            onclick="showOtpLogin()">Login with OTP instead</button>
+
+          <div class="divider-auth">or</div>
+
+          <a href="/api/auth/google" class="google-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4" />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853" />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05" />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335" />
+            </svg>
+            Continue with Google
+          </a>
+        </div>
+
+        <!-- ================= SIGN UP PANEL ================= -->
+        <div class="auth-panel" id="panelSignup">
+          <h3>Create your account 🚀</h3>
+          <p class="subtitle">Join BookEase — free forever</p>
+
+          <div class="role-cards">
+            <div class="role-card selected" id="roleClient" onclick="selectRole('client')">
+              <div class="role-card-icon">🧑</div>
+              <div class="role-card-title">I'm a Client</div>
+              <div class="role-card-desc">Browse & book services</div>
+            </div>
+            <div class="role-card" id="roleHost" onclick="selectRole('host')">
+              <div class="role-card-icon">🏪</div>
+              <div class="role-card-title">I'm a Host</div>
+              <div class="role-card-desc">List my business</div>
+            </div>
+          </div>
+
+          <form id="signupForm" novalidate>
+            <input type="hidden" id="selectedRole" value="client">
+            <div class="form-group">
+              <label class="form-label form-label-light">Full Name</label>
+              <div class="input-group">
+                <span class="input-icon">👤</span>
+                <input type="text" id="signupName" class="form-control form-control-dark" placeholder="Aarav Sharma"
+                  required>
+              </div>
+              <div class="form-error" id="signupNameErr">Name is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-light">Email Address</label>
+              <div class="input-group">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="signupEmail" class="form-control form-control-dark"
+                  placeholder="you@example.com" required>
+              </div>
+              <div class="form-error" id="signupEmailErr">Enter a valid email</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-light">Phone Number</label>
+              <div class="input-group">
+                <span class="input-icon">📱</span>
+                <input type="tel" id="signupPhone" class="form-control form-control-dark" placeholder="+91 98765 43210"
+                  required>
+              </div>
+              <div class="form-error" id="signupPhoneErr">Phone number is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-light">Password</label>
+              <div class="input-group" style="position:relative">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="signupPass" class="form-control form-control-dark"
+                  placeholder="Min. 8 characters" required>
+                <button type="button" class="input-action" onclick="togglePwd('signupPass',this)"
+                  style="position:absolute;right:14px;top:50%;transform:translateY(-50%)">👁</button>
+              </div>
+              <div class="form-error" id="signupPassErr">Password must be at least 8 characters</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-light">Confirm Password</label>
+              <div class="input-group">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="signupConfirm" class="form-control form-control-dark"
+                  placeholder="Repeat password" required>
+              </div>
+              <div class="form-error" id="signupConfirmErr">Passwords do not match</div>
+            </div>
+            <div class="form-group" id="whatsappGroup" style="display:none">
+              <label class="form-label form-label-light">📱 WhatsApp Number <span
+                  style="color:var(--accent);font-size:0.8rem">(for booking notifications)</span></label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span
+                  style="background:rgba(255,255,255,0.08);padding:10px 14px;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,0.1);font-weight:700;color:#fff">+91</span>
+                <input type="tel" id="regWhatsapp" class="form-control form-control-dark" placeholder="98765 43210"
+                  maxlength="10">
+              </div>
+              <small style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;display:block">Clients will
+                contact you on this number</small>
+            </div>
+
+            <button type="button" class="btn btn-primary w-full" id="signupInitialBtn"
+              onclick="startSignupFlow()">Create Account →</button>
+          </form>
+
+          <div class="divider-auth">or</div>
+
+          <a href="/api/auth/google" class="google-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4" />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853" />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05" />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335" />
+            </svg>
+            Continue with Google
+          </a>
+        </div>
+
+        <!-- ================= FORGOT PASSWORD / LOGIN WITH OTP PANEL ================= -->
+        <div id="forgotPanel" style="display:none">
+
+          <!-- Step 1: Selection -->
+          <div class="forgot-step active" id="forgotStep1">
+            <h3 id="forgotTitle">Reset Password 🔑</h3>
+            <p class="subtitle" id="forgotSubtitle">How would you like to verify?</p>
+
+            <div class="auth-tabs" style="margin-bottom: 24px">
+              <button class="auth-tab active" id="tabForgotPhone" onclick="switchForgotTab('phone')">📱 Via Phone
+                OTP</button>
+              <button class="auth-tab" id="tabForgotEmail" onclick="switchForgotTab('email')">📧 Via Email OTP</button>
+            </div>
+
+            <!-- Phone Form -->
+            <div id="forgotPhoneForm">
+              <div class="form-group">
+                <label class="form-label form-label-light">Registered Phone Number</label>
+                <div class="input-group">
+                  <span class="input-icon">📱</span>
+                  <input type="tel" id="forgotPhone" class="form-control form-control-dark"
+                    placeholder="+91 98765 43210">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" id="btnForgotPhone" onclick="sendAuthOtp('phone')">Send Phone OTP
+                →</button>
+            </div>
+
+            <!-- Email Form -->
+            <div id="forgotEmailForm" style="display:none">
+              <div class="form-group">
+                <label class="form-label form-label-light">Registered Email Address</label>
+                <div class="input-group">
+                  <span class="input-icon">✉️</span>
+                  <input type="email" id="forgotEmail" class="form-control form-control-dark"
+                    placeholder="you@example.com">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" id="btnForgotEmail" onclick="sendAuthOtp('email')">Send Email OTP
+                →</button>
+            </div>
+
+            <p style="text-align:center;margin-top:20px"><button type="button" class="auth-link"
+                onclick="hideForgot()">← Back to Sign In</button></p>
+          </div>
+
+          <!-- Step 2: New Password (only for forgot password flow) -->
+          <div class="forgot-step" id="forgotStep2">
+            <h3>New Password 🔒</h3>
+            <p class="subtitle">Choose a strong new password</p>
+            <div class="form-group">
+              <label class="form-label form-label-light">New Password</label>
+              <input type="password" id="newPass" class="form-control form-control-dark"
+                placeholder="Min. 8 characters">
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-light">Confirm New Password</label>
+              <input type="password" id="confirmNewPass" class="form-control form-control-dark"
+                placeholder="Repeat password">
+            </div>
+            <button class="btn btn-primary w-full" id="btnResetPass" onclick="resetPassword()">Reset Password →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GLOBAL OTP MODAL ================= -->
+  <div class="otp-modal" id="globalOtpModal">
+    <div class="otp-modal-content">
+      <button class="close-modal-btn" onclick="closeOtpModal()">✕</button>
+      <h2 style="color:#fff;font-size:1.6rem;margin-bottom:8px" id="otpModalTitle">Verify Phone</h2>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:24px;line-height:1.5" id="otpModalSubtitle">
+        Enter the 6-digit code sent to your WhatsApp</p>
+
+      <div class="otp-inputs" id="otpInputContainer">
+        <!-- Generated via JS -->
+      </div>
+
+      <button class="btn btn-primary w-full" style="margin-top:20px" id="btnVerifyOtp"
+        onclick="verifyGlobalOtp()">Verify Code</button>
+
+      <div class="otp-timer">
+        <span style="color:rgba(255,255,255,0.5)">Didn't receive code?</span>
+        <button class="auth-link" id="btnResendOtp" disabled onclick="resendGlobalOtp()">Resend in 30s</button>
+      </div>
+
+      <div style="margin-top:20px; text-align:center">
+        <button class="auth-link" style="color:rgba(255,255,255,0.4); font-size:0.85rem"
+          onclick="closeOtpModal()">Change Details</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="../js/utils.js?v=4"></script>
+  <script src="../js/api.js?v=5"></script>
+  <script src="../js/auth.js?v=5"></script>
+  <script>
+    // ── Google OAuth Token Handler ──
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      const role = params.get('role');
+      const userStr = params.get('user');
+      if (token && role) {
+        localStorage.setItem('be_token', token);
+        localStorage.setItem('userRole', role);
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', role);
+        if (userStr) {
+          try { localStorage.setItem('be_user', decodeURIComponent(userStr)); } catch (e) { }
+        }
+        window.history.replaceState({}, '', '/login.html');
+        if (role === 'host') { window.location.href = '/host-dashboard.html'; }
+        else if (role === 'admin') { window.location.href = '/admin-dashboard.html'; }
+        else { window.location.href = '/client-dashboard.html'; }
+        return;
+      }
+    })();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('error') === 'google_not_configured' || urlParams.get('error') === 'google_failed') {
+        if (typeof showToast === 'function') {
+          showToast('Google login is not configured yet. Please use email/password or OTP.', 'warning');
+        }
+      }
+
+      try {
+        const res = await fetch('/api/auth/google-available');
+        const data = await res.json();
+        if (!data.available) {
+          document.querySelectorAll('.google-btn, .divider-auth').forEach(el => {
+            el.style.display = 'none';
+          });
+        }
+      } catch (e) {
+        console.error('Failed to check google availability', e);
+      }
+    });
+  </script>
+</body>
+
+</html>

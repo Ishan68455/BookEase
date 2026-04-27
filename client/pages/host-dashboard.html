@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Host Dashboard — BookEase</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/animations.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="manifest" href="../manifest.json">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BookEase">
+<meta name="theme-color" content="#FFCA28">
+</head>
+<body class="page-load" data-theme="dark">
+
+<div class="dashboard-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><a href="#">Book<span>Ease</span></a></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Dashboard</div>
+      <a class="sidebar-link active" onclick="showSection('overview')"><span class="icon">📊</span>Overview</a>
+      <a class="sidebar-link" onclick="showSection('business')"><span class="icon">🏪</span>Business Setup</a>
+      <a class="sidebar-link" onclick="showSection('services')"><span class="icon">💆</span>Services</a>
+      <a class="sidebar-link" onclick="showSection('slots')"><span class="icon">🗓️</span>Slot Manager</a>
+      <a class="sidebar-link" onclick="showSection('inbox')"><span class="icon">📥</span>Bookings Inbox<span class="sidebar-badge" id="inboxBadge">0</span></a>
+      <a class="sidebar-link" onclick="showSection('reviews')"><span class="icon">⭐</span>Reviews</a>
+      <a class="sidebar-link" onclick="showSection('earnings')"><span class="icon">💰</span>Earnings</a>
+      <div class="sidebar-section-label" style="margin-top:16px">Settings</div>
+      <a class="sidebar-link" onclick="showSection('notifs')"><span class="icon">🔔</span>Notifications</a>
+      <button class="sidebar-item sign-out-item" onclick="handleSignOut()">
+        <span class="sidebar-icon">🚪</span>
+        <span>Sign Out</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <img class="sidebar-user-avatar" id="sidebarAvatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Host" alt="Avatar">
+        <div><div class="sidebar-user-name" id="sidebarName">Loading...</div><div class="sidebar-user-role">Host</div></div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <main class="dashboard-main">
+    <div class="dashboard-topbar">
+      <button class="mobile-back-btn" id="mobileBackBtn" onclick="history.length > 1 ? history.back() : window.location.href='index.html'" style="display:none;background:none;border:none;color:var(--text-primary);font-size:1.4rem;cursor:pointer;padding:4px 8px;margin-right:4px">&#8592;</button>
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+      <h1 class="topbar-title" id="topbarTitle">Overview</h1>
+      <div class="topbar-actions">
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode"><span id="themeIcon">🌙</span></button>
+        <button class="notif-btn"><span>🔔</span><span class="notif-dot" id="hostNotifDot" style="display:none"></span></button>
+        <a href="#" id="shareProfileLink" target="_blank" class="btn btn-outline btn-sm">🔗 My Profile</a>
+      </div>
+    </div>
+    <div class="dashboard-content">
+
+      <!-- Overview -->
+      <section id="secOverview" class="dash-section">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon gold">📅</div><div class="stat-value" id="hStatTotal">—</div><div class="stat-label">Total Bookings</div></div>
+          <div class="stat-card"><div class="stat-icon teal">💰</div><div class="stat-value" id="hStatRevenue">—</div><div class="stat-label">Revenue (Month)</div></div>
+          <div class="stat-card"><div class="stat-icon blue">📆</div><div class="stat-value" id="hStatToday">—</div><div class="stat-label">Today's Bookings</div></div>
+          <div class="stat-card"><div class="stat-icon red">⭐</div><div class="stat-value" id="hStatRating">—</div><div class="stat-label">Avg Rating</div></div>
+        </div>
+        <div class="chart-wrap">
+          <h3 style="margin-bottom:20px">Bookings Overview (Last 6 Months)</h3>
+          <canvas id="bookingsChart" height="100"></canvas>
+        </div>
+        <div style="margin-top:24px">
+          <h3 style="margin-bottom:16px">Recent Bookings</h3>
+          <div id="recentInbox"></div>
+        </div>
+      </section>
+
+      <!-- Business Setup -->
+      <section id="secBusiness" class="dash-section hidden">
+        <h2 style="margin-bottom:24px">Business Setup 🏪</h2>
+        <div style="max-width:700px">
+          <form id="businessForm">
+            <div style="display:flex;gap:20px;align-items:center;margin-bottom:28px;flex-wrap:wrap">
+              <div style="position:relative">
+                <img id="coverPreview" src="" alt="Cover" style="width:140px;height:90px;border-radius:var(--radius-md);object-fit:cover;background:var(--secondary);border:2px solid var(--border)">
+                <label style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--primary);padding:4px 12px;border-radius:var(--radius-full);font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap">📷 Cover<input type="file" accept="image/*" style="display:none" id="coverInput" onchange="previewCover(this)"></label>
+              </div>
+              <div style="flex:1">
+                <h3 id="bizNameDisplay" style="color:var(--text-primary)">Your Business</h3>
+                <p class="text-muted text-sm" id="bizTypeDisplay">Business Type</p>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Business Name *</label><input type="text" class="form-control" id="bizName" required></div>
+            <div class="form-group">
+              <label class="form-label">Business Type *</label>
+              <select class="form-control" id="bizType">
+                <option>Barber</option><option>Salon</option><option>Consultant</option>
+                <option>Spa</option><option>Clinic</option><option>Fitness</option>
+                <option>Legal</option><option>Medical</option><option>Tattoo</option>
+                <option>Wellness</option><option>Beauty</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Business Description</label><textarea class="form-control" id="bizDesc" rows="3" placeholder="Tell clients about your business..."></textarea></div>
+            <div class="grid grid-2" style="gap:16px">
+              <div class="form-group"><label class="form-label">City</label><input type="text" class="form-control" id="bizCity"></div>
+              <div class="form-group"><label class="form-label">Address</label><input type="text" class="form-control" id="bizAddress"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                📱 WhatsApp Number * 
+                <span style="color:var(--accent);font-size:0.8rem">(Required for client notifications)</span>
+              </label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="background:var(--secondary);padding:10px 14px;border-radius:var(--radius-md);border:1px solid var(--border);font-weight:700">+91</span>
+                <input type="tel" class="form-control" id="bizWhatsapp" placeholder="98765 43210" maxlength="10" style="border-color:rgba(255,202,40,0.3)">
+              </div>
+              <small style="color:var(--text-muted);font-size:0.78rem;margin-top:4px;display:block">Clients will see a WhatsApp chat button on your profile</small>
+            </div>
+            <div class="grid grid-2" style="gap:16px">
+              <div class="form-group"><label class="form-label">Instagram URL</label><input type="url" class="form-control" id="bizInsta" placeholder="https://instagram.com/..."></div>
+              <div class="form-group"><label class="form-label">Facebook URL</label><input type="url" class="form-control" id="bizFb" placeholder="https://facebook.com/..."></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cancellation Policy</label>
+              <select class="form-control" id="bizCancel">
+                <option value="2hr">2 Hours Before</option>
+                <option value="24hr">24 Hours Before</option>
+                <option value="none">No Cancellation Allowed</option>
+              </select>
+            </div>
+            <h4 style="margin-bottom:16px">Working Hours</h4>
+            <div id="workingHoursGrid" style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px"></div>
+            <button type="submit" class="btn btn-primary">Save Business Profile</button>
+          </form>
+          <div style="margin-top:32px">
+            <h4 style="margin-bottom:16px">Gallery Images</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px" id="galleryPreview"></div>
+            <label class="btn btn-outline btn-sm">Add Gallery Images<input type="file" accept="image/*" multiple style="display:none" onchange="uploadGallery(this)"></label>
+          </div>
+          <div style="margin-top:32px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+              <h4>Staff Members</h4>
+              <button class="btn btn-outline btn-sm" onclick="addStaffRow()">+ Add Staff</button>
+            </div>
+            <div id="staffList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Services -->
+      <section id="secServices" class="dash-section hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <h2>Services Manager 💆</h2>
+          <button class="btn btn-primary btn-sm" onclick="openServiceModal()">+ Add Service</button>
+        </div>
+        <div class="grid grid-auto" id="servicesGrid"></div>
+      </section>
+
+      <!-- Slots -->
+      <section id="secSlots" class="dash-section hidden">
+        <h2 style="margin-bottom:24px">Slot Manager 🗓️</h2>
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
+          <div class="slot-calendar">
+            <div class="calendar-header">
+              <button class="calendar-nav" onclick="changeMonth(-1)">‹</button>
+              <h4 id="calMonthLabel">April 2024</h4>
+              <button class="calendar-nav" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="calendar-grid" id="calGrid"></div>
+          </div>
+          <div>
+            <div class="dash-card" style="margin-bottom:16px" id="slotCreatorCard">
+              <h4 style="margin-bottom:16px">Add Slots for <span id="selectedDateLabel">—</span></h4>
+              <div id="slotTimeInputs">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                  <input type="time" class="form-control" id="slotStart" value="09:00" style="flex:1">
+                  <span style="color:var(--text-muted)">to</span>
+                  <input type="time" class="form-control" id="slotEnd" value="10:00" style="flex:1">
+                  <button class="btn btn-primary btn-sm" onclick="addSlotTime()">+</button>
+                </div>
+              </div>
+              <div id="pendingSlotsList" style="margin-bottom:12px"></div>
+              <button class="btn btn-primary w-full" onclick="saveSlots()">Save Slots</button>
+            </div>
+            <div class="dash-card">
+              <h4 style="margin-bottom:14px">Bulk Weekly Schedule</h4>
+              <p class="text-muted text-sm" style="margin-bottom:12px">Auto-fill slots for multiple weeks</p>
+              <div class="form-group"><label class="form-label">Start Date</label><input type="date" class="form-control" id="bulkStart"></div>
+              <div class="form-group"><label class="form-label">Repeat for (weeks)</label><input type="number" class="form-control" id="bulkWeeks" value="4" min="1" max="12"></div>
+              <div class="form-group"><label class="form-label">Time</label><div style="display:flex;gap:8px"><input type="time" class="form-control" id="bulkFrom" value="09:00"><input type="time" class="form-control" id="bulkTo" value="17:00"></div></div>
+              <button class="btn btn-dark btn-sm w-full" onclick="bulkCreateSlots()">Generate Schedule</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:24px">
+          <h4 style="margin-bottom:12px">Slots for <span id="selectedDateLabel2">today</span></h4>
+          <div class="slot-pills" id="managedSlots"></div>
+        </div>
+      </section>
+
+      <!-- Bookings Inbox -->
+      <section id="secInbox" class="dash-section hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <h2>Bookings Inbox 📥</h2>
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterInbox('all',this)">All</button>
+            <button class="filter-tab" onclick="filterInbox('pending',this)">Pending</button>
+            <button class="filter-tab" onclick="filterInbox('confirmed',this)">Confirmed</button>
+            <button class="filter-tab" onclick="filterInbox('completed',this)">Completed</button>
+          </div>
+        </div>
+        <div id="inboxList"></div>
+      </section>
+
+      <!-- Reviews -->
+      <section id="secReviews" class="dash-section hidden">
+        <h2 style="margin-bottom:24px">Reviews & Ratings ⭐</h2>
+        <div style="display:flex;gap:24px;align-items:center;background:linear-gradient(135deg,var(--secondary),#0D1B3E);border-radius:var(--radius-xl);padding:28px;margin-bottom:28px;border:1px solid rgba(255,202,40,0.1)">
+          <div style="text-align:center;flex-shrink:0">
+            <div style="font-size:3.5rem;font-weight:900;color:var(--accent)" id="avgRating">—</div>
+            <div style="color:var(--accent);font-size:1.2rem" id="avgStars">★★★★★</div>
+            <div style="color:rgba(255,255,255,0.4);font-size:0.82rem" id="totalReviews">0 reviews</div>
+          </div>
+          <div style="flex:1;min-width:0" id="ratingBars"></div>
+        </div>
+        <div id="reviewsList"></div>
+      </section>
+
+      <!-- Earnings -->
+      <section id="secEarnings" class="dash-section hidden">
+        <h2 style="margin-bottom:24px">Earnings 💰</h2>
+        <div class="stats-grid" style="margin-bottom:24px">
+          <div class="stat-card"><div class="stat-icon gold">💰</div><div class="stat-value" id="earnTotal">—</div><div class="stat-label">Total Earned</div></div>
+          <div class="stat-card"><div class="stat-icon teal">📅</div><div class="stat-value" id="earnMonth">—</div><div class="stat-label">This Month</div></div>
+        </div>
+        <div class="chart-wrap">
+          <h3 style="margin-bottom:20px">Monthly Revenue</h3>
+          <canvas id="earningsChart" height="120"></canvas>
+        </div>
+      </section>
+
+      <!-- Notifications -->
+      <section id="secNotifs" class="dash-section hidden">
+        <h2 style="margin-bottom:24px">Notifications 🔔</h2>
+        <div id="hostNotifList"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Service Modal -->
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal">
+    <div class="modal-header"><h3 class="modal-title" id="serviceModalTitle">Add Service</h3><button class="modal-close" onclick="closeModal('serviceModal')">✕</button></div>
+    <form id="serviceForm">
+      <input type="hidden" id="serviceEditId">
+      <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center">
+        <img id="serviceImgPreview" src="" alt="" style="width:80px;height:60px;border-radius:var(--radius-md);object-fit:cover;background:var(--secondary)">
+        <label class="btn btn-outline btn-sm">Upload Image<input type="file" accept="image/*" style="display:none" onchange="previewServiceImg(this)"></label>
+      </div>
+      <div class="form-group"><label class="form-label">Service Name *</label><input type="text" class="form-control" id="sName" required></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-control" id="sDesc" rows="2"></textarea></div>
+      <div class="grid grid-2" style="gap:16px">
+        <div class="form-group"><label class="form-label">Price (₹) *</label><input type="number" class="form-control" id="sPrice" min="0" required></div>
+        <div class="form-group"><label class="form-label">Duration (mins) *</label><input type="number" class="form-control" id="sDuration" min="5" required></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-control" id="sCategory">
+          <option>Hair</option><option>Skin</option><option>Wellness</option><option>Fitness</option>
+          <option>Business</option><option>Legal</option><option>Medical</option><option>Beauty</option><option>Spa</option><option>Other</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary w-full">Save Service</button>
+    </form>
+  </div>
+</div>
+
+<!-- Booking Detail Modal -->
+<div class="modal-overlay" id="bookingDetailModal">
+  <div class="modal">
+    <div class="modal-header"><h3 class="modal-title">Booking Details</h3><button class="modal-close" onclick="closeModal('bookingDetailModal')">✕</button></div>
+    <div id="bookingDetailContent"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<style>
+.theme-toggle-btn { background: var(--secondary); border: 1px solid var(--border); border-radius: 50px; padding: 8px 14px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; gap: 6px; transition: all 0.3s ease; color: var(--text-primary); }
+.theme-toggle-btn:hover { background: var(--accent); color: var(--primary); transform: scale(1.05); }
+
+/* Hamburger Button Styling */
+.sidebar-toggle, .hamburger {
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  padding: 7px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.sidebar-toggle:hover, .hamburger:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.4);
+  color: #FFCA28;
+}
+
+[data-theme="light"] .sidebar-toggle,
+[data-theme="light"] .hamburger {
+  color: #0D0D0D;
+  border-color: rgba(0,0,0,0.2);
+}
+
+[data-theme="light"] .sidebar-toggle:hover,
+[data-theme="light"] .hamburger:hover {
+  background: rgba(0,0,0,0.05);
+  color: #0D0D0D;
+}
+</style>
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/host-dashboard.js"></script>
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.body.setAttribute('data-theme', next);
+  html.className = next === 'dark' ? 'dark-theme' : 'light-theme';
+  document.body.style.display = 'none';
+  document.body.offsetHeight;
+  document.body.style.display = '';
+  localStorage.setItem('be_theme', next);
+  var icons = document.querySelectorAll('#themeIcon, .theme-icon');
+  icons.forEach(function(icon) { icon.textContent = next === 'dark' ? '🌙' : '☀️'; });
+}
+(function() {
+  var saved = localStorage.getItem('be_theme') || 'dark';
+  var html = document.documentElement;
+  html.setAttribute('data-theme', saved);
+  document.body.setAttribute('data-theme', saved);
+  html.className = saved === 'dark' ? 'dark-theme' : 'light-theme';
+  var icons = document.querySelectorAll('#themeIcon, .theme-icon');
+  icons.forEach(function(icon) { icon.textContent = saved === 'dark' ? '🌙' : '☀️'; });
+})();
+// Close sidebar when nav link is clicked on mobile
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  });
+});
+</script>
+
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <button class="bottom-nav-item" onclick="showSection('overview')">
+    <span>🏠</span><label>Home</label>
+  </button>
+  <button class="bottom-nav-item" onclick="showSection('services')">
+    <span>⚙️</span><label>Services</label>
+  </button>
+  <button class="bottom-nav-item" onclick="showSection('slots')">
+    <span>📅</span><label>Slots</label>
+  </button>
+  <button class="bottom-nav-item" onclick="showSection('inbox')">
+    <span>📥</span><label>Inbox</label>
+  </button>
+</nav>
+</body>
+</html>

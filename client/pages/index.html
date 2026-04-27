@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookEase — Book smarter. Serve better.</title>
+<meta name="description" content="BookEase is the premium online booking platform. Book any service, anytime, anywhere.">
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/animations.css">
+<style>
+/* Hero */
+.hero { min-height: 100vh; background: var(--primary); display: flex; align-items: center; position: relative; overflow: hidden; padding-top: var(--navbar-h); }
+.hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,202,40,0.18) 0%, transparent 70%); pointer-events: none; }
+.hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,202,40,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,202,40,0.04) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+.hero-content { position: relative; z-index: 1; text-align: center; max-width: 860px; margin: 0 auto; padding: 80px 20px; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,202,40,0.1); border: 1px solid rgba(255,202,40,0.25); color: var(--accent); padding: 6px 18px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 28px; }
+.hero h1 { color: #fff; margin-bottom: 24px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-sub { color: rgba(255,255,255,0.6); font-size: 1.15rem; max-width: 580px; margin: 0 auto 40px; line-height: 1.7; }
+.hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+.hero-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); display: block; }
+.hero-stat-label { color: rgba(255,255,255,0.45); font-size: 0.82rem; }
+
+/* Marquee */
+.marquee-section { background: rgba(255,202,40,0.06); border-top: 1px solid rgba(255,202,40,0.1); border-bottom: 1px solid rgba(255,202,40,0.1); padding: 16px 0; overflow: hidden; }
+.marquee-item { display: flex; align-items: center; gap: 8px; padding: 0 32px; color: rgba(255,255,255,0.5); font-size: 0.88rem; font-weight: 500; white-space: nowrap; }
+.marquee-item span { color: var(--accent); }
+
+/* Features */
+.features { background: var(--primary); }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
+.feature-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius-lg); padding: 28px; transition: var(--transition); }
+.feature-card:hover { background: rgba(255,202,40,0.05); border-color: rgba(255,202,40,0.25); transform: translateY(-4px); }
+.feature-icon { width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(255,202,40,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 20px; }
+.feature-card h3 { color: #fff; font-size: 1.05rem; margin-bottom: 10px; }
+.feature-card p { color: rgba(255,255,255,0.5); font-size: 0.88rem; line-height: 1.6; }
+
+/* How it works */
+.how { background: var(--primary); }
+.how-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; position: relative; }
+.how-steps::before { content: ''; position: absolute; top: 36px; left: calc(16.66% + 20px); right: calc(16.66% + 20px); height: 2px; background: linear-gradient(90deg, var(--accent), var(--success)); }
+.how-step { text-align: center; position: relative; }
+.how-num { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #e5b400); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: var(--primary); margin: 0 auto 20px; box-shadow: 0 4px 24px rgba(255,202,40,0.4); }
+.how-step h3 { color: #fff; font-size: 1.1rem; margin-bottom: 8px; }
+.how-step p { color: rgba(255,255,255,0.5); font-size: 0.88rem; }
+
+/* Host CTA */
+.host-cta { background: linear-gradient(135deg, #1A1A2E, #0D0D0D); border: 1px solid rgba(255,202,40,0.15); border-radius: var(--radius-xl); padding: 64px 48px; text-align: center; margin: 0 5%; }
+.host-cta h2 { color: #fff; margin-bottom: 16px; }
+.host-cta p { color: rgba(255,255,255,0.55); max-width: 520px; margin: 0 auto 36px; }
+
+/* Testimonials */
+.testimonials { background: var(--primary); }
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.testi-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius-lg); padding: 24px; transition: var(--transition); }
+.testi-card:hover { border-color: rgba(255,202,40,0.2); }
+.testi-stars { color: var(--accent); font-size: 0.9rem; margin-bottom: 14px; }
+.testi-text { color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.7; margin-bottom: 18px; font-style: italic; }
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--success)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 0.85rem; }
+.testi-name { color: #fff; font-weight: 700; font-size: 0.9rem; }
+.testi-role { color: rgba(255,255,255,0.4); font-size: 0.78rem; }
+
+/* Footer */
+.footer { background: #080808; border-top: 1px solid rgba(255,255,255,0.06); padding: 60px 0 32px; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+.footer-brand p { color: rgba(255,255,255,0.4); font-size: 0.88rem; max-width: 280px; margin-top: 12px; line-height: 1.7; }
+.footer-col h4 { color: #fff; font-size: 0.88rem; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.03em; }
+.footer-col a { display: block; color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-bottom: 10px; transition: var(--transition); }
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom { padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-bottom p { color: rgba(255,255,255,0.3); font-size: 0.82rem; }
+.footer-socials { display: flex; gap: 12px; }
+.footer-socials a { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-size: 0.9rem; transition: var(--transition); }
+.footer-socials a:hover { background: var(--accent); color: var(--primary); }
+
+/* Section label */
+.section-label { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,202,40,0.1); border: 1px solid rgba(255,202,40,0.2); color: var(--accent); padding: 5px 16px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 18px; }
+
+@media (max-width: 900px) {
+  .how-steps { grid-template-columns: 1fr; } .how-steps::before { display: none; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .host-cta { padding: 40px 24px; margin: 0 4%; }
+}
+@media (max-width: 600px) {
+  .hero-stats { gap: 24px; } .footer-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: center; }
+}
+</style>
+
+<link rel="manifest" href="../manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BookEase">
+<meta name="theme-color" content="#FFCA28">
+</head>
+<body class="page-load">
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-brand"><span>Book</span><span class="logo-dot">Ease</span></div>
+  <div class="navbar-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it Works</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="host-profile.html">Explore</a>
+  </div>
+  <div class="navbar-actions">
+    <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode"><span id="themeIcon">🌙</span></button>
+    <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+    <a href="login.html?tab=signup" class="btn btn-primary btn-sm">Get Started</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#features">Features</a>
+  <a href="#how">How it Works</a>
+  <a href="#testimonials">Reviews</a>
+  <a href="login.html">Sign In</a>
+  <a href="login.html?tab=signup" class="btn btn-primary" style="text-align:center">Get Started Free</a>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow anim-init">✦ The Future of Booking is Here</div>
+      <h1 class="hero-title">Book any service.<br><em>Anytime. Anywhere.</em></h1>
+      <p class="hero-sub hero-subtitle">The all-in-one booking platform for clients and service providers. Instant confirmations, smart notifications, and zero friction.</p>
+      <div class="hero-actions hero-cta">
+        <a href="login.html?tab=signup" class="btn btn-primary btn-lg glow-pulse" id="heroCtaBtn">Get Started Free →</a>
+        <a href="#how" class="btn btn-outline btn-lg">See How it Works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-num counter" data-target="10000">0</span><span class="hero-stat-label">Bookings Made</span></div>
+        <div class="hero-stat"><span class="hero-stat-num counter" data-target="500">0</span><span class="hero-stat-label">Active Hosts</span></div>
+        <div class="hero-stat"><span class="hero-stat-num counter" data-target="50">0</span><span class="hero-stat-label">Cities</span></div>
+        <div class="hero-stat"><span class="hero-stat-num counter" data-target="98">0</span><span class="hero-stat-label">% Satisfaction</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-section">
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <div class="marquee-item">✦ <span>Hair Salons</span></div>
+      <div class="marquee-item">✦ <span>Spa & Wellness</span></div>
+      <div class="marquee-item">✦ <span>Consultants</span></div>
+      <div class="marquee-item">✦ <span>Medical Clinics</span></div>
+      <div class="marquee-item">✦ <span>Legal Services</span></div>
+      <div class="marquee-item">✦ <span>Fitness Coaches</span></div>
+      <div class="marquee-item">✦ <span>Barbers</span></div>
+      <div class="marquee-item">✦ <span>Tattoo Studios</span></div>
+      <div class="marquee-item">✦ <span>Hair Salons</span></div>
+      <div class="marquee-item">✦ <span>Spa & Wellness</span></div>
+      <div class="marquee-item">✦ <span>Consultants</span></div>
+      <div class="marquee-item">✦ <span>Medical Clinics</span></div>
+      <div class="marquee-item">✦ <span>Legal Services</span></div>
+      <div class="marquee-item">✦ <span>Fitness Coaches</span></div>
+      <div class="marquee-item">✦ <span>Barbers</span></div>
+      <div class="marquee-item">✦ <span>Tattoo Studios</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Features -->
+<section class="features section" id="features">
+  <div class="container">
+    <div class="text-center mb-24 anim-init">
+      <div class="section-label">Why BookEase</div>
+      <h2 style="color:#fff">Everything you need to<br><span class="text-accent">run your bookings</span></h2>
+    </div>
+    <div class="features-grid stagger-cards">
+      <div class="feature-card anim-init"><div class="feature-icon">📅</div><h3>Real-time Availability</h3><p>See live slot availability. No double bookings, no confusion — ever.</p></div>
+      <div class="feature-card anim-init"><div class="feature-icon">⚡</div><h3>Instant Confirmation</h3><p>Bookings confirmed in seconds. Clients get email + WhatsApp instantly.</p></div>
+      <div class="feature-card anim-init"><div class="feature-icon">💳</div><h3>Flexible Payments</h3><p>Pay online via UPI or choose Cash on Delivery. Your call.</p></div>
+      <div class="feature-card anim-init"><div class="feature-icon">🔔</div><h3>Smart Notifications</h3><p>Automatic reminders 1 hour before every appointment. Never a no-show.</p></div>
+      <div class="feature-card anim-init"><div class="feature-icon">⭐</div><h3>Verified Reviews</h3><p>Authentic ratings from real clients. Build trust, grow faster.</p></div>
+      <div class="feature-card anim-init"><div class="feature-icon">📊</div><h3>Host Analytics</h3><p>Track revenue, bookings, and ratings with beautiful dashboard charts.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="how section" id="how">
+  <div class="container">
+    <div class="text-center mb-24 anim-init" style="margin-bottom:48px">
+      <div class="section-label">How it Works</div>
+      <h2 style="color:#fff">Three steps to <span class="text-accent">done</span></h2>
+    </div>
+    <div class="how-steps">
+      <div class="how-step anim-init"><div class="how-num">1</div><h3 style="color:#fff">Find a Service</h3><p>Browse hundreds of verified hosts by category, location, or rating.</p></div>
+      <div class="how-step anim-init anim-delay-2"><div class="how-num">2</div><h3 style="color:#fff">Pick a Slot</h3><p>Choose your date and available time slot in real time. No waiting.</p></div>
+      <div class="how-step anim-init anim-delay-4"><div class="how-num">3</div><h3 style="color:#fff">You're Done!</h3><p>Get instant confirmation via email and WhatsApp. See you there!</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Host CTA -->
+<section class="section-sm">
+  <div class="host-cta anim-init">
+    <div class="section-label">For Service Providers</div>
+    <h2>Are you a service provider?<br><span class="text-accent">List your business FREE.</span></h2>
+    <p>Join 500+ hosts on BookEase. Set up your profile, add services, manage slots, and start accepting bookings in minutes.</p>
+    <a href="login.html?tab=signup&role=host" class="btn btn-primary btn-lg">Register as a Host →</a>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials section" id="testimonials">
+  <div class="container">
+    <div class="text-center mb-24 anim-init" style="margin-bottom:48px">
+      <div class="section-label">Testimonials</div>
+      <h2 style="color:#fff">Loved by <span class="text-accent">thousands</span></h2>
+    </div>
+    <div class="testi-grid stagger-cards">
+      <div class="testi-card anim-init"><div class="testi-stars">★★★★★</div><p class="testi-text">"BookEase completely transformed how I run my salon. Clients love the seamless booking experience and I love the dashboard!"</p><div class="testi-author"><div class="testi-avatar">PR</div><div><div class="testi-name">Priya Rajan</div><div class="testi-role">Salon Owner, Mumbai</div></div></div></div>
+      <div class="testi-card anim-init"><div class="testi-stars">★★★★★</div><p class="testi-text">"I booked a consultation in literally 2 minutes. Got a WhatsApp confirmation immediately. This is how all booking should work."</p><div class="testi-author"><div class="testi-avatar">AK</div><div><div class="testi-name">Arjun Kulkarni</div><div class="testi-role">Client, Bangalore</div></div></div></div>
+      <div class="testi-card anim-init"><div class="testi-stars">★★★★★</div><p class="testi-text">"Revenue went up 40% in the first month. The analytics are incredible and reminders cut my no-show rate to almost zero."</p><div class="testi-author"><div class="testi-avatar">SM</div><div><div class="testi-name">Suresh Mehta</div><div class="testi-role">Fitness Coach, Delhi</div></div></div></div>
+      <div class="testi-card anim-init"><div class="testi-stars">★★★★☆</div><p class="testi-text">"The dark mode UI is gorgeous. My clients always comment on how premium the booking page looks. Great first impression!"</p><div class="testi-author"><div class="testi-avatar">NK</div><div><div class="testi-name">Neha Kapoor</div><div class="testi-role">Spa Owner, Pune</div></div></div></div>
+      <div class="testi-card anim-init"><div class="testi-stars">★★★★★</div><p class="testi-text">"Set up my entire legal consultation business in one afternoon. The slot manager is brilliant — so intuitive."</p><div class="testi-author"><div class="testi-avatar">RP</div><div><div class="testi-name">Rohit Pillai</div><div class="testi-role">Legal Consultant, Chennai</div></div></div></div>
+      <div class="testi-card anim-init"><div class="testi-stars">★★★★★</div><p class="testi-text">"BookEase is the only platform where both the client and host experience are equally polished. Highly recommended."</p><div class="testi-author"><div class="testi-avatar">DS</div><div><div class="testi-name">Divya Sharma</div><div class="testi-role">Client, Hyderabad</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-0.03em">Book<span style="color:var(--accent)">Ease</span></div>
+        <p>The premium booking platform for clients and service providers. Book smarter. Serve better.</p>
+        <div class="footer-socials" style="margin-top:16px">
+          <a href="#" aria-label="Twitter">𝕏</a>
+          <a href="#" aria-label="Instagram">📸</a>
+          <a href="#" aria-label="Facebook">f</a>
+          <a href="#" aria-label="LinkedIn">in</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="#features">Features</a><a href="#how">How it Works</a><a href="login.html?tab=signup&role=host">For Hosts</a><a href="login.html?tab=signup">For Clients</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="#">About Us</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Refund Policy</a><a href="#">Cookie Policy</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 BookEase. All rights reserved. Made with ❤️ in India.</p>
+      <p style="color:rgba(255,255,255,0.25);font-size:0.78rem">Book smarter. Serve better.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../js/utils.js"></script>
+<script>
+// ── Google OAuth Token Handler ──
+(function handleGoogleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  const role = params.get('role');
+  const userStr = params.get('user');
+  if (token && role) {
+    localStorage.setItem('be_token', token);
+    localStorage.setItem('userRole', role);
+    if (userStr) {
+      try { localStorage.setItem('be_user', decodeURIComponent(userStr)); } catch(e) {}
+    }
+    localStorage.setItem('token', token);
+    localStorage.setItem('role', role);
+    window.history.replaceState({}, document.title, '/');
+    setTimeout(() => {
+      if (role === 'host') window.location.href = '/host-dashboard.html';
+      else if (role === 'admin') window.location.href = '/admin-dashboard.html';
+      else window.location.href = '/client-dashboard.html';
+    }, 100);
+  }
+})();
+
+// Scroll progress
+window.addEventListener('scroll', () => {
+  const p = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('scrollProgress').style.width = p + '%';
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Hamburger
+document.getElementById('hamburger').addEventListener('click', function() {
+  this.classList.toggle('active');
+  document.getElementById('mobileNav').classList.toggle('open');
+});
+
+// Animated counters
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const dur = 2000; const step = dur / 60;
+  let current = 0;
+  const inc = target / (dur / 16);
+  const timer = setInterval(() => {
+    current += inc;
+    if (current >= target) { el.textContent = target >= 1000 ? (target/1000).toFixed(0)+'K+' : target+'+'; clearInterval(timer); }
+    else { el.textContent = target >= 1000 ? Math.floor(current/1000)+'K+' : Math.floor(current)+'+'; }
+  }, 16);
+}
+
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('anim-in');
+      if (e.target.classList.contains('counter')) animateCounter(e.target);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.anim-init').forEach(el => observer.observe(el));
+document.querySelectorAll('.counter').forEach(el => observer.observe(el));
+
+// Ripple on buttons
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    const rect = this.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    this.appendChild(r);
+    r.addEventListener('animationend', () => r.remove());
+  });
+});
+</script>
+<style>
+.theme-toggle-btn { background: var(--secondary); border: 1px solid var(--border); border-radius: 50px; padding: 8px 14px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; gap: 6px; transition: all 0.3s ease; color: var(--text-primary); }
+.theme-toggle-btn:hover { background: var(--accent); color: var(--primary); transform: scale(1.05); }
+</style>
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.body.setAttribute('data-theme', next);
+  html.className = next === 'dark' ? 'dark-theme' : 'light-theme';
+  document.body.style.display = 'none';
+  document.body.offsetHeight;
+  document.body.style.display = '';
+  localStorage.setItem('be_theme', next);
+  var icons = document.querySelectorAll('#themeIcon, .theme-icon');
+  icons.forEach(function(icon) { icon.textContent = next === 'dark' ? '🌙' : '☀️'; });
+}
+(function() {
+  var saved = localStorage.getItem('be_theme') || 'dark';
+  var html = document.documentElement;
+  html.setAttribute('data-theme', saved);
+  document.body.setAttribute('data-theme', saved);
+  html.className = saved === 'dark' ? 'dark-theme' : 'light-theme';
+  var icons = document.querySelectorAll('#themeIcon, .theme-icon');
+  icons.forEach(function(icon) { icon.textContent = saved === 'dark' ? '🌙' : '☀️'; });
+})();
+</script>
+</body>
+</html>

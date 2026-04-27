@@ -1,0 +1,11 @@
+{
+  "name": "online-booking-system",
+  "version": "1.0.0",
+  "description": "BookEase is a premium, full-stack online booking management system designed for independent service providers and their clients. It features a dark-luxury aesthetic, real-time availability, dual payment options, and automated notifications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

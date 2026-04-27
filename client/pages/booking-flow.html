@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Appointment — BookEase</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/animations.css">
+<link rel="stylesheet" href="../css/booking.css?v=3">
+<link rel="manifest" href="../manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BookEase">
+<meta name="theme-color" content="#FFCA28">
+<!-- ⚡ Apply saved theme BEFORE render to prevent flash -->
+<script>
+(function() {
+  var t = localStorage.getItem('be_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.className = t === 'dark' ? 'dark-theme' : 'light-theme';
+})();
+</script>
+</head>
+<body class="page-load" style="background:var(--primary)">
+
+<nav class="navbar" id="navbar" style="position:relative;backdrop-filter:none">
+  <div class="navbar-brand"><a href="index.html" style="color:inherit">Book<span class="logo-dot">Ease</span></a></div>
+  <div class="navbar-actions"><button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode"><span id="themeIcon">🌙</span></button></div>
+</nav>
+
+<div style="max-width:1100px;margin:0 auto;padding:32px 5%">
+  <div class="booking-layout">
+    <!-- Wizard -->
+    <div>
+      <!-- Steps -->
+      <div class="wizard-steps" style="margin-bottom:40px">
+        <div class="wizard-step-wrap">
+          <div class="step-bubble active" id="sb1">1</div>
+          <div class="step-label active" id="sl1">Service</div>
+        </div>
+        <div class="step-connector" id="sc1"></div>
+        <div class="wizard-step-wrap">
+          <div class="step-bubble" id="sb2">2</div>
+          <div class="step-label" id="sl2">Date & Slot</div>
+        </div>
+        <div class="step-connector" id="sc2"></div>
+        <div class="wizard-step-wrap">
+          <div class="step-bubble" id="sb3">3</div>
+          <div class="step-label" id="sl3">Note</div>
+        </div>
+        <div class="step-connector" id="sc3"></div>
+        <div class="wizard-step-wrap">
+          <div class="step-bubble" id="sb4">4</div>
+          <div class="step-label" id="sl4">Payment</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Service -->
+      <div class="step-panel active" id="step1">
+        <h2 style="color:#fff;margin-bottom:8px">Choose a Service</h2>
+        <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">Select the service you'd like to book</p>
+        <div class="service-select-grid" id="serviceSelectGrid">
+          <div class="skeleton skeleton-img" style="border-radius:var(--radius-lg)"></div>
+          <div class="skeleton skeleton-img" style="border-radius:var(--radius-lg)"></div>
+          <div class="skeleton skeleton-img" style="border-radius:var(--radius-lg)"></div>
+        </div>
+        <!-- Staff selection -->
+        <div id="staffSection" style="display:none;margin-top:24px">
+          <h4 style="color:#fff;margin-bottom:12px">Preferred Staff (Optional)</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:10px" id="staffPills"></div>
+        </div>
+        <div class="wizard-nav">
+          <div></div>
+          <button class="btn btn-primary" onclick="goStep(2)">Next: Pick a Date →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Date & Slot -->
+      <div class="step-panel" id="step2">
+        <h2 style="color:#fff;margin-bottom:8px">Pick a Date & Time</h2>
+        <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">Choose your preferred appointment slot</p>
+        <div class="booking-date-section">
+          <div class="date-calendar-wrap" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">
+            <div class="calendar-header">
+              <button class="calendar-nav" onclick="changeMonth(-1)" style="color:#fff;border-color:rgba(255,255,255,0.15)">‹</button>
+              <h4 style="color:#fff" id="calMonth">—</h4>
+              <button class="calendar-nav" onclick="changeMonth(1)" style="color:#fff;border-color:rgba(255,255,255,0.15)">›</button>
+            </div>
+            <div class="calendar-grid" id="calGrid">
+              <div class="calendar-day-label">Su</div><div class="calendar-day-label">Mo</div><div class="calendar-day-label">Tu</div>
+              <div class="calendar-day-label">We</div><div class="calendar-day-label">Th</div><div class="calendar-day-label">Fr</div><div class="calendar-day-label">Sa</div>
+            </div>
+          </div>
+          <div class="slots-panel" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">
+            <h4 style="color:#fff">Available Slots</h4>
+            <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin-bottom:16px" id="slotsDateLabel">Select a date first</p>
+            <div class="slot-pills" id="slotPills"></div>
+            <div class="slots-legend">
+              <div class="legend-item"><div class="legend-dot available"></div>Available</div>
+              <div class="legend-item"><div class="legend-dot booked"></div>Booked</div>
+            </div>
+          </div>
+        </div>
+        <div class="wizard-nav">
+          <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+          <button class="btn btn-primary" onclick="goStep(3)">Next: Add Note →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Note -->
+      <div class="step-panel" id="step3">
+        <h2 style="color:#fff;margin-bottom:8px">Any Special Requests?</h2>
+        <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">Optional — let the host know anything special</p>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-lg);padding:24px">
+          <div class="form-group">
+            <label class="form-label" style="color:rgba(255,255,255,0.7)">Special Note</label>
+            <textarea class="form-control" id="specialNote" rows="5" placeholder="e.g. I prefer a female stylist / I have sensitive skin / Please confirm before starting..." style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff"></textarea>
+          </div>
+        </div>
+        <div class="wizard-nav">
+          <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+          <button class="btn btn-primary" onclick="goStep(4)">Next: Payment →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Payment -->
+      <div class="step-panel" id="step4">
+        <h2 style="color:#fff;margin-bottom:8px">Choose Payment</h2>
+        <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">How would you like to pay?</p>
+        <div class="payment-options">
+          <div class="payment-card" id="payCod" onclick="selectPayment('cod')" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.12)">
+            <div class="payment-card-icon">💵</div>
+            <div class="payment-card-label" style="color:#fff">Pay at Shop</div>
+            <div class="payment-card-desc">Pay in cash when you arrive</div>
+          </div>
+          <div class="payment-card" id="payOnline" onclick="selectPayment('online')" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.12)">
+            <div class="payment-card-icon">📱</div>
+            <div class="payment-card-label" style="color:#fff">Pay Online</div>
+            <div class="payment-card-desc">UPI / QR Code — instant</div>
+          </div>
+        </div>
+        <div class="wizard-nav">
+          <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+          <button class="btn btn-primary btn-lg glow-pulse" id="confirmBtn" onclick="confirmBooking()">Confirm Booking ✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Sidebar -->
+    <div>
+      <div class="booking-summary-sidebar" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">
+        <h4 style="color:#fff;margin-bottom:16px">Booking Summary</h4>
+        <div class="summary-host-banner">
+          <img id="sumHostImg" src="https://placehold.co/48x48/1A1A2E/FFCA28?text=B" style="width:48px;height:48px;border-radius:var(--radius-md);object-fit:cover" alt="">
+          <div><div style="color:#fff;font-weight:700" id="sumHostName">—</div><div style="color:rgba(255,255,255,0.4);font-size:0.8rem" id="sumHostType">—</div></div>
+        </div>
+        <div class="summary-rows">
+          <div class="summary-row"><span style="color:rgba(255,255,255,0.5)">Service</span><span style="color:#fff;font-weight:600" id="sumService">—</span></div>
+          <div class="summary-row"><span style="color:rgba(255,255,255,0.5)">Date</span><span style="color:#fff;font-weight:600" id="sumDate">—</span></div>
+          <div class="summary-row"><span style="color:rgba(255,255,255,0.5)">Time</span><span style="color:#fff;font-weight:600" id="sumTime">—</span></div>
+          <div class="summary-row"><span style="color:rgba(255,255,255,0.5)">Duration</span><span style="color:#fff;font-weight:600" id="sumDur">—</span></div>
+          <div class="summary-row"><span style="color:rgba(255,255,255,0.5)">Payment</span><span style="color:#fff;font-weight:600" id="sumPayment">—</span></div>
+        </div>
+        <div class="summary-total"><span style="color:#fff">Total</span><span style="color:var(--success);font-size:1.2rem" id="sumTotal">₹—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR Payment Modal -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal" style="background:#111120;max-width:420px;text-align:center">
+    <div class="modal-header" style="justify-content:center"><h3 class="modal-title" style="color:#fff">Scan & Pay 📱</h3></div>
+    <div id="qrPayContent">
+      <div class="qr-amount" id="qrAmount">₹—</div>
+      <div class="qr-upi">UPI ID: bookease@paytm (Demo)</div>
+      <img class="qr-image" src="../assets/images/dummy-qr.png" alt="QR Code" id="qrImg" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=bookease@paytm&pn=BookEase&am='+document.getElementById('qrAmount').textContent.replace('₹','')">
+      <div class="qr-timer">
+        <span>⏱ Auto-confirming in</span>
+        <span class="qr-timer-count" id="qrCountdown">5</span>
+        <span>seconds...</span>
+      </div>
+      <div class="progress-bar-wrap" style="margin:0 auto 16px;max-width:200px">
+        <div class="progress-bar" id="qrProgress" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="qrSuccess" style="display:none;padding:20px 0">
+      <div style="font-size:4rem;margin-bottom:12px;animation:scaleIn 0.5s cubic-bezier(0.4,0,0.2,1)">✅</div>
+      <div style="color:var(--success);font-size:1.2rem;font-weight:700;margin-bottom:4px">Payment Received!</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.88rem">Booking confirmed. Redirecting...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="../js/utils.js?v=5"></script>
+<script src="../js/api.js?v=5"></script>
+<script src="../js/booking.js?v=2"></script>
+<script src="../js/payment.js?v=2"></script>
+</body>
+</html>
