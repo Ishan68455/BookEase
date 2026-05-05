@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 const brandColor = '#FFCA28';
 const dark = '#0D0D0D';
 
-// ─── Rate limiting: max 5 OTPs per phone/email per hour ───
 async function checkRateLimit(target, field) {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const query = { createdAt: { $gte: oneHourAgo } };
@@ -24,22 +23,18 @@ async function checkRateLimit(target, field) {
   }
 }
 
-// ─── Send OTP via WhatsApp ───
 const sendWhatsAppOTP = async (phone, otp) => {
   try {
     const num = String(phone).replace(/\D/g, '');
     const whatsappPhone = num.startsWith('91') ? num : '91' + num;
 
-    const response = await axios.post('https://api.fonnte.com/send', {
-      target: whatsappPhone,
-      message: `🔐 *BookEase OTP Verification*\n\nYour OTP is: *${otp}*\n\n⏱ Valid for 10 minutes.\n🚫 Do not share this with anyone.\n\n— BookEase Team`,
-      countryCode: '91'
-    }, {
-      headers: {
-        'Authorization': process.env.FONNTE_TOKEN,
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      `https://api.green-api.com/waInstance${process.env.GREEN_API_ID}/sendMessage/${process.env.GREEN_API_TOKEN}`,
+      {
+        chatId: whatsappPhone + '@c.us',
+        message: `🔐 *BookEase OTP Verification*\n\nYour OTP is: *${otp}*\n\n⏱ Valid for 10 minutes.\n🚫 Do not share this with anyone.\n\n— BookEase Team`
       }
-    });
+    );
 
     console.log(`✅ WhatsApp OTP sent to ${phone}`, response.data);
     return { success: true };
@@ -54,7 +49,6 @@ const sendWhatsAppOTP = async (phone, otp) => {
   }
 };
 
-// ─── Send OTP via Email ───
 async function sendEmailOtp(email, otp, purpose = 'verification') {
   const subjectMap = {
     verification: 'BookEase Email Verification',
@@ -65,7 +59,6 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
   
   const subject = subjectMap[purpose] || 'BookEase Verification';
   
-  // Password reset confirmation email (no OTP)
   if (purpose === 'password-reset-confirm') {
     const html = emailWrapper(`
       <h2 style="color:${dark};margin-top:0;font-size:24px">Password Reset Successful 🔒</h2>
@@ -78,7 +71,6 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
         </a>
       </div>
     `);
-    
     await transporter.sendMail({
       from: `"BookEase" <${process.env.EMAIL_USER}>`,
       to: email,
