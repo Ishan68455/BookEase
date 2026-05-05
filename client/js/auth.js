@@ -1,5 +1,7 @@
 /* BookEase — auth.js */
 
+// hi
+
 let selectedRole = 'client';
 
 // Global state for OTP flows
