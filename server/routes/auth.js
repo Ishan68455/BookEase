@@ -75,7 +75,7 @@ router.post('/send-email-otp', async (req, res) => {
     const { email, type } = req.body;
     if (!email || !type) return res.status(400).json({ message: 'Email and type required' });
 
-    await checkRateLimit(email.toLowerCase(), 'email');
+    await Promise.race([checkRateLimit(email.toLowerCase(), 'email'), new Promise((_, rej) => setTimeout(() => rej(new Error('DB timeout')), 8000))]);
 
     if (type.includes('login') || type.includes('forgot')) {
       const user = await User.findOne({ email: email.toLowerCase() });
@@ -102,6 +102,49 @@ router.post('/send-email-otp', async (req, res) => {
   } finally {
     clearTimeout(timeout);
   }
+});
+
+// TEMPORARY: Diagnostic endpoint — remove after fixing email
+router.get('/test-email', async (req, res) => {
+  const nodemailer = require('nodemailer');
+  const info = {
+    EMAIL_USER_SET: !!process.env.EMAIL_USER,
+    EMAIL_PASS_SET: !!process.env.EMAIL_PASS,
+    EMAIL_USER_VALUE: process.env.EMAIL_USER ? process.env.EMAIL_USER.substring(0, 4) + '***' : 'NOT SET',
+    EMAIL_PASS_LENGTH: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0
+  };
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 5000
+    });
+
+    await transporter.verify();
+    info.smtp_status = 'CONNECTED ✅';
+
+    await transporter.sendMail({
+      from: `"BookEase Test" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: 'BookEase SMTP Test',
+      text: 'If you see this, email is working!'
+    });
+    info.test_send = 'SENT ✅';
+  } catch (err) {
+    info.smtp_error = err.message;
+    info.smtp_code = err.code;
+    info.full_error = err.toString();
+  }
+
+  res.json(info);
 });
 
 router.post('/verify-email-otp', async (req, res) => {
