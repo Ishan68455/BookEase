@@ -2,15 +2,18 @@ const axios = require('axios');
 const nodemailer = require('nodemailer');
 const Otp = require('../models/Otp');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+function getTransporter() {
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    },
+    tls: { rejectUnauthorized: false }
+  });
+}
 
 const brandColor = '#FFCA28';
 const dark = '#0D0D0D';
@@ -73,7 +76,7 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
         </a>
       </div>
     `);
-    await transporter.sendMail({
+    await getTransporter().sendMail({
       from: `"BookEase" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Your BookEase password was reset',
@@ -104,7 +107,7 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
     </div>
   `);
   
-  await transporter.sendMail({
+  await getTransporter().sendMail({
     from: `"BookEase" <${process.env.EMAIL_USER}>`,
     to: email,
     subject,
