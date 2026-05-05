@@ -61,6 +61,9 @@ router.post('/verify-phone-otp', async (req, res) => {
 });
 
 router.post('/send-email-otp', async (req, res) => {
+  const timeout = setTimeout(() => {
+    if (!res.headersSent) res.status(500).json({ message: 'Server timeout - please try again' });
+  }, 10000);
   try {
     const { email, type } = req.body;
     if (!email || !type) return res.status(400).json({ message: 'Email and type required' });
