@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // const API_URL = `https://7107.api.greenapi.com`;
-const API_URL = `https://api.green-api.com`;
+const API_URL = `https://7107.api.greenapi.com`;
 const ID = process.env.GREEN_API_ID;
 const TOKEN = process.env.GREEN_API_TOKEN;
 
