@@ -180,27 +180,17 @@ async function startSignupFlow() {
 window.startSignupFlow = startSignupFlow;
 
 async function handleSignupPhoneVerified() {
-  // Phone is verified. Now trigger Email OTP.
   try {
     showToast('Phone verified! Now verifying email...', 'success');
     currentAuthType = 'email';
     currentContact = signupData.email;
-    
-    // Slight delay so user sees success state
-    setTimeout(async () => {
-      clearOtpInputs();
-      closeOtpModal();
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      try {
-        await API.auth.sendEmailOtp({ email: currentContact, type: 'email-signup' });
-        openOtpModal('Verify Your Email', `Enter the 6-digit code sent to ${currentContact}`);
-      } catch (err) {
-        showToast(err.message, 'error');
-      }
-    }, 1000);
+    clearOtpInputs();
+    closeOtpModal();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await API.auth.sendEmailOtp({ email: currentContact, type: 'email-signup' });
+    openOtpModal('Verify Your Email', `Enter the 6-digit code sent to ${currentContact}`);
   } catch(err) {
-    console.error(err);
+    showToast(err.message, 'error');
   }
 }
 
@@ -272,7 +262,7 @@ async function verifyGlobalOtp() {
     if (currentFlow === 'signup') {
       if (currentAuthType === 'phone') {
         await API.auth.verifyPhoneOtp({ phone: currentContact, type: 'phone-signup', otp });
-        handleSignupPhoneVerified();
+        await handleSignupPhoneVerified();
       } else {
         await API.auth.verifyEmailOtp({ email: currentContact, type: 'email-signup', otp });
         handleSignupEmailVerified();
