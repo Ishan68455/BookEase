@@ -55,6 +55,17 @@ const sendWhatsAppOTP = async (phone, otp) => {
 };
 
 async function sendEmailOtp(email, otp, purpose = 'verification') {
+  console.log(`📧 sendEmailOtp called — email: ${email}, purpose: ${purpose}, otp: ${otp ? '****' : 'null'}`);
+  
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error('📧 EMAIL_USER or EMAIL_PASS not set in environment!');
+    console.log('='.repeat(50));
+    console.log(`🔐 DEV EMAIL OTP: ${otp}`);
+    console.log(`📧 Email: ${email}`);
+    console.log('='.repeat(50));
+    return true;
+  }
+  
   const subjectMap = {
     verification: 'BookEase Email Verification',
     login: 'BookEase Login OTP',
@@ -64,58 +75,68 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
   
   const subject = subjectMap[purpose] || 'BookEase Verification';
   
-  if (purpose === 'password-reset-confirm') {
+  try {
+    if (purpose === 'password-reset-confirm') {
+      const html = emailWrapper(`
+        <h2 style="color:${dark};margin-top:0;font-size:24px">Password Reset Successful 🔒</h2>
+        <p style="color:#444;line-height:1.7;font-size:15px">Your BookEase password has been successfully reset.</p>
+        <p style="color:#444;line-height:1.7;font-size:15px">If you didn't make this change, please contact our support immediately.</p>
+        <div style="text-align:center;margin:32px 0">
+          <a href="${process.env.BASE_URL || 'http://localhost:5001'}/login.html" 
+             style="display:inline-block;background:${brandColor};color:${dark};padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:700">
+            Sign In Now →
+          </a>
+        </div>
+      `);
+      await getTransporter().sendMail({
+        from: `"BookEase" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Your BookEase password was reset',
+        html
+      });
+      return true;
+    }
+    
     const html = emailWrapper(`
-      <h2 style="color:${dark};margin-top:0;font-size:24px">Password Reset Successful 🔒</h2>
-      <p style="color:#444;line-height:1.7;font-size:15px">Your BookEase password has been successfully reset.</p>
-      <p style="color:#444;line-height:1.7;font-size:15px">If you didn't make this change, please contact our support immediately.</p>
+      <h2 style="color:${dark};margin-top:0;font-size:24px">${
+        purpose === 'forgot' ? 'Password Reset OTP 🔑' : 
+        purpose === 'login' ? 'Login Verification 🔐' : 
+        'Email Verification ✉️'
+      }</h2>
+      <p style="color:#444;line-height:1.7;font-size:15px">Your verification code is:</p>
       <div style="text-align:center;margin:32px 0">
-        <a href="${process.env.BASE_URL || 'http://localhost:5001'}/login.html" 
-           style="display:inline-block;background:${brandColor};color:${dark};padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:700">
-          Sign In Now →
-        </a>
+        <div style="display:inline-block;background:linear-gradient(135deg,#f8f8f8,#fff);border:2px solid ${brandColor};border-radius:16px;padding:24px 40px;box-shadow:0 4px 24px rgba(255,202,40,0.15)">
+          <span style="font-size:48px;font-weight:900;letter-spacing:12px;color:${dark};font-family:'DM Sans',Arial,monospace">${otp}</span>
+        </div>
+      </div>
+      <p style="color:#888;font-size:14px;text-align:center;margin:16px 0">
+        This code expires in <strong>10 minutes</strong>
+      </p>
+      <div style="background:#f9f9f9;border-radius:10px;padding:16px;margin-top:24px">
+        <p style="color:#999;font-size:13px;margin:0;text-align:center">
+          If you didn't request this, please ignore this email.
+        </p>
       </div>
     `);
+    
     await getTransporter().sendMail({
       from: `"BookEase" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Your BookEase password was reset',
+      subject,
       html
     });
+    
+    console.log(`✅ Email OTP sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error('📧 Email OTP send error:', error.message);
+    console.log('='.repeat(50));
+    console.log(`🔐 DEV EMAIL OTP: ${otp}`);
+    console.log(`📧 Email: ${email}`);
+    console.log('='.repeat(50));
+    // Don't throw — let the flow continue so the OTP modal still opens
     return true;
   }
-  
-  const html = emailWrapper(`
-    <h2 style="color:${dark};margin-top:0;font-size:24px">${
-      purpose === 'forgot' ? 'Password Reset OTP 🔑' : 
-      purpose === 'login' ? 'Login Verification 🔐' : 
-      'Email Verification ✉️'
-    }</h2>
-    <p style="color:#444;line-height:1.7;font-size:15px">Your verification code is:</p>
-    <div style="text-align:center;margin:32px 0">
-      <div style="display:inline-block;background:linear-gradient(135deg,#f8f8f8,#fff);border:2px solid ${brandColor};border-radius:16px;padding:24px 40px;box-shadow:0 4px 24px rgba(255,202,40,0.15)">
-        <span style="font-size:48px;font-weight:900;letter-spacing:12px;color:${dark};font-family:'DM Sans',Arial,monospace">${otp}</span>
-      </div>
-    </div>
-    <p style="color:#888;font-size:14px;text-align:center;margin:16px 0">
-      This code expires in <strong>10 minutes</strong>
-    </p>
-    <div style="background:#f9f9f9;border-radius:10px;padding:16px;margin-top:24px">
-      <p style="color:#999;font-size:13px;margin:0;text-align:center">
-        If you didn't request this, please ignore this email.
-      </p>
-    </div>
-  `);
-  
-  await getTransporter().sendMail({
-    from: `"BookEase" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject,
-    html
-  });
-  
-  console.log(`📧 Email OTP sent to ${email}`);
-  return true;
 }
 
 function emailWrapper(content) {

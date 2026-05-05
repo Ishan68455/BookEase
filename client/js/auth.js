@@ -262,7 +262,7 @@ async function verifyGlobalOtp() {
     if (currentFlow === 'signup') {
       if (currentAuthType === 'phone') {
         await API.auth.verifyPhoneOtp({ phone: currentContact, type: 'phone-signup', otp });
-        await await await handleSignupPhoneVerified();
+        await handleSignupPhoneVerified();
       } else {
         await API.auth.verifyEmailOtp({ email: currentContact, type: 'email-signup', otp });
         handleSignupEmailVerified();

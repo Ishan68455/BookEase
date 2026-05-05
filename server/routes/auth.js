@@ -61,9 +61,16 @@ router.post('/verify-phone-otp', async (req, res) => {
 });
 
 router.post('/send-email-otp', async (req, res) => {
+  console.log('📧 [send-email-otp] Route hit:', req.body);
+  
+  // Add 10 second timeout
   const timeout = setTimeout(() => {
-    if (!res.headersSent) res.status(500).json({ message: 'Server timeout - please try again' });
+    if (!res.headersSent) {
+      console.error('📧 [send-email-otp] TIMEOUT after 10s');
+      res.status(500).json({ message: 'Server timeout - please try again' });
+    }
   }, 10000);
+
   try {
     const { email, type } = req.body;
     if (!email || !type) return res.status(400).json({ message: 'Email and type required' });
@@ -79,11 +86,21 @@ router.post('/send-email-otp', async (req, res) => {
     }
 
     const purpose = type.includes('login') ? 'login' : type.includes('forgot') ? 'forgot' : 'verification';
+    console.log('📧 [send-email-otp] Creating OTP for:', email.toLowerCase(), 'purpose:', purpose);
     const { plainOtp } = await Otp.createOtp({ email: email.toLowerCase(), type });
+    console.log('📧 [send-email-otp] OTP created, sending email...');
     await sendEmailOtp(email.toLowerCase(), plainOtp, purpose);
-    res.json({ message: 'OTP sent to email' });
+    console.log('📧 [send-email-otp] Email sent successfully');
+    if (!res.headersSent) {
+      res.json({ message: 'OTP sent to email' });
+    }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('📧 [send-email-otp] ERROR:', err.message);
+    if (!res.headersSent) {
+      res.status(500).json({ message: err.message });
+    }
+  } finally {
+    clearTimeout(timeout);
   }
 });
 
