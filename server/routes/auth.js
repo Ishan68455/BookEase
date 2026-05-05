@@ -106,42 +106,32 @@ router.post('/send-email-otp', async (req, res) => {
 
 // TEMPORARY: Diagnostic endpoint — remove after fixing email
 router.get('/test-email', async (req, res) => {
-  const nodemailer = require('nodemailer');
+  const axios = require('axios');
   const info = {
-    EMAIL_USER_SET: !!process.env.EMAIL_USER,
-    EMAIL_PASS_SET: !!process.env.EMAIL_PASS,
-    EMAIL_USER_VALUE: process.env.EMAIL_USER ? process.env.EMAIL_USER.substring(0, 4) + '***' : 'NOT SET',
-    EMAIL_PASS_LENGTH: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0
+    BREVO_API_KEY_SET: !!process.env.BREVO_API_KEY,
+    BREVO_KEY_PREFIX: process.env.BREVO_API_KEY ? process.env.BREVO_API_KEY.substring(0, 8) + '***' : 'NOT SET',
+    EMAIL_USER: process.env.EMAIL_USER || 'NOT SET'
   };
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+      sender: { name: 'BookEase Test', email: process.env.EMAIL_USER },
+      to: [{ email: process.env.EMAIL_USER }],
+      subject: 'BookEase Email Test ✅',
+      htmlContent: '<h1>Email is working!</h1><p>If you see this, Brevo is configured correctly.</p>'
+    }, {
+      headers: {
+        'api-key': process.env.BREVO_API_KEY,
+        'Content-Type': 'application/json'
       },
-      connectionTimeout: 5000,
-      greetingTimeout: 5000,
-      socketTimeout: 5000
+      timeout: 8000
     });
-
-    await transporter.verify();
-    info.smtp_status = 'CONNECTED ✅';
-
-    await transporter.sendMail({
-      from: `"BookEase Test" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: 'BookEase SMTP Test',
-      text: 'If you see this, email is working!'
-    });
-    info.test_send = 'SENT ✅';
+    info.status = 'EMAIL SENT ✅';
+    info.brevo_response = response.data;
   } catch (err) {
-    info.smtp_error = err.message;
-    info.smtp_code = err.code;
-    info.full_error = err.toString();
+    info.error = err.response?.data?.message || err.message;
+    info.error_code = err.response?.data?.code || err.code;
+    info.full_error = JSON.stringify(err.response?.data || err.message);
   }
 
   res.json(info);

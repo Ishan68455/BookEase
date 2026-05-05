@@ -1,21 +1,5 @@
 const axios = require('axios');
-const nodemailer = require('nodemailer');
 const Otp = require('../models/Otp');
-
-function getTransporter() {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    },
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 8000
-  });
-}
 
 const brandColor = '#FFCA28';
 const dark = '#0D0D0D';
@@ -56,17 +40,22 @@ const sendWhatsAppOTP = async (phone, otp) => {
   }
 };
 
+// ==========================================
+// EMAIL via Brevo HTTP API (port 443, works on Render)
+// ==========================================
 async function sendEmailOtp(email, otp, purpose = 'verification') {
-  console.log(`📧 sendEmailOtp called — email: ${email}, purpose: ${purpose}, otp: ${otp ? '****' : 'null'}`);
-  
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error('📧 EMAIL_USER or EMAIL_PASS not set in environment!');
+  console.log(`📧 sendEmailOtp called — email: ${email}, purpose: ${purpose}`);
+
+  if (!process.env.BREVO_API_KEY) {
+    console.error('📧 BREVO_API_KEY not set in environment!');
     console.log('='.repeat(50));
     console.log(`🔐 DEV EMAIL OTP: ${otp}`);
     console.log(`📧 Email: ${email}`);
     console.log('='.repeat(50));
     return true;
   }
+
+  const senderEmail = process.env.EMAIL_USER || 'noreply@bookease.com';
   
   const subjectMap = {
     verification: 'BookEase Email Verification',
@@ -74,32 +63,23 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
     forgot: 'BookEase Password Reset OTP',
     'password-reset-confirm': 'Your BookEase password was reset'
   };
-  
   const subject = subjectMap[purpose] || 'BookEase Verification';
-  
-  try {
-    if (purpose === 'password-reset-confirm') {
-      const html = emailWrapper(`
-        <h2 style="color:${dark};margin-top:0;font-size:24px">Password Reset Successful 🔒</h2>
-        <p style="color:#444;line-height:1.7;font-size:15px">Your BookEase password has been successfully reset.</p>
-        <p style="color:#444;line-height:1.7;font-size:15px">If you didn't make this change, please contact our support immediately.</p>
-        <div style="text-align:center;margin:32px 0">
-          <a href="${process.env.BASE_URL || 'http://localhost:5001'}/login.html" 
-             style="display:inline-block;background:${brandColor};color:${dark};padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:700">
-            Sign In Now →
-          </a>
-        </div>
-      `);
-      await getTransporter().sendMail({
-        from: `"BookEase" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Your BookEase password was reset',
-        html
-      });
-      return true;
-    }
-    
-    const html = emailWrapper(`
+
+  let html;
+  if (purpose === 'password-reset-confirm') {
+    html = emailWrapper(`
+      <h2 style="color:${dark};margin-top:0;font-size:24px">Password Reset Successful 🔒</h2>
+      <p style="color:#444;line-height:1.7;font-size:15px">Your BookEase password has been successfully reset.</p>
+      <p style="color:#444;line-height:1.7;font-size:15px">If you didn't make this change, please contact our support immediately.</p>
+      <div style="text-align:center;margin:32px 0">
+        <a href="${process.env.BASE_URL || 'http://localhost:5001'}/login.html" 
+           style="display:inline-block;background:${brandColor};color:${dark};padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:700">
+          Sign In Now →
+        </a>
+      </div>
+    `);
+  } else {
+    html = emailWrapper(`
       <h2 style="color:${dark};margin-top:0;font-size:24px">${
         purpose === 'forgot' ? 'Password Reset OTP 🔑' : 
         purpose === 'login' ? 'Login Verification 🔐' : 
@@ -120,18 +100,29 @@ async function sendEmailOtp(email, otp, purpose = 'verification') {
         </p>
       </div>
     `);
-    
-    await getTransporter().sendMail({
-      from: `"BookEase" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject,
-      html
+  }
+
+  try {
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+      sender: { name: 'BookEase', email: senderEmail },
+      to: [{ email: email }],
+      subject: subject,
+      htmlContent: html
+    }, {
+      headers: {
+        'api-key': process.env.BREVO_API_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 8000
     });
-    
-    console.log(`✅ Email OTP sent to ${email}`);
+
+    console.log(`✅ Email OTP sent to ${email} via Brevo`, response.data);
     return true;
   } catch (error) {
-    console.error('📧 Email OTP send error:', error.message);
+    const errMsg = error.response?.data?.message || error.message;
+    console.error('📧 Brevo email error:', errMsg);
+    console.error('📧 Full error:', JSON.stringify(error.response?.data || error.message));
     console.log('='.repeat(50));
     console.log(`🔐 DEV EMAIL OTP: ${otp}`);
     console.log(`📧 Email: ${email}`);
