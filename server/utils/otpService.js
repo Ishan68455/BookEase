@@ -18,7 +18,7 @@ function getTransporter() {
 const brandColor = '#FFCA28';
 const dark = '#0D0D0D';
 
-async function checkRateLimit(target, field) {
+async function checkRateLimit(target, field) { return; // temporarily disabled
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const query = { createdAt: { $gte: oneHourAgo } };
   query[field] = target;
