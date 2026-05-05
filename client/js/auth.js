@@ -188,6 +188,7 @@ async function handleSignupPhoneVerified() {
     setTimeout(async () => {
       clearOtpInputs();
       closeOtpModal();
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       try {
         await API.auth.sendEmailOtp({ email: currentContact, type: 'email-signup' });
